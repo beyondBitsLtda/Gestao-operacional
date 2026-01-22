@@ -347,6 +347,70 @@ function getCampo(fieldId) {
     return campo ? campo.value : '';
 }
 
+// =========================================================================
+// FUNÇÃO ÚNICA: CAPTURAR DESVIO_INICIO / DESVIO_TERMINO (SEM ALTERAR CÁLCULO)
+// =========================================================================
+/**
+ * getDesvioInicioTerminoFromTela(contexto)
+ * ---------------------------------------------------------
+ * Objetivo:
+ * - Ler os campos de desvio já calculados na tela.
+ * - Mapear para as colunas DESVIO_INICIO e DESVIO_TERMINO.
+ *
+ * Regra aplicada:
+ * - DESVIO_INICIO: valor do desvio base (linha "Desvio", coluna "Início" do Físico).
+ * - DESVIO_TERMINO: valor do desvio término (linha "Desvio", coluna "Término" do Físico).
+ * - Se não existir campo de término, retorna "0" (documentado no CHANGELOG).
+ */
+function getDesvioInicioTerminoFromTela(contexto) {
+    // === Helper interno: normalizar número pt-BR para string numérica ===
+    function normalizeNumberBR(value) {
+        if (value === null || value === undefined) return '';
+        var raw = String(value).replace('%', '').trim();
+        if (!raw) return '';
+        var normalized = raw.replace(/\./g, '').replace(',', '.');
+        var num = parseFloat(normalized);
+        return isNaN(num) ? '' : String(num);
+    }
+
+    var scope = contexto || 'GLOBAL';
+    var inicioValor = '';
+    var terminoValor = '';
+
+    // Prioridade: tabela de Informações Físicas (Início/Término)
+    var fisicoTable = document.getElementById('fisico-table');
+    if (fisicoTable) {
+        var inicioInput = fisicoTable.querySelector("input[name='desvioLB']");
+        var terminoInput = fisicoTable.querySelector("input[name='desvioLBTermino']");
+
+        inicioValor = normalizeNumberBR(inicioInput ? inicioInput.value : '');
+        terminoValor = normalizeNumberBR(terminoInput ? terminoInput.value : '');
+    } else {
+        console.warn('[INTEGRACAO][DESVIO] #fisico-table não encontrada. Tentando fallback no histograma...');
+        var histTable = document.getElementById('hist-table');
+        if (histTable) {
+            var histInicio = histTable.querySelector("input[name='desvioLB']");
+            inicioValor = normalizeNumberBR(histInicio ? histInicio.value : '');
+            terminoValor = ''; // histograma não possui término
+        }
+    }
+
+    // Se não houver término, define como "0" (regra documentada)
+    if (!terminoValor) {
+        terminoValor = '0';
+    }
+
+    console.log('[INTEGRACAO][DESVIO]', scope, {
+        DESVIO_INICIO: inicioValor,
+        DESVIO_TERMINO: terminoValor
+    });
+
+    return {
+        DESVIO_INICIO: inicioValor,
+        DESVIO_TERMINO: terminoValor
+    };
+}
+
 // Função principal para salvar todos os dados
 function salvarDados() {
     try {
@@ -483,6 +547,362 @@ function syncCurvaHotParaInputs(dadosCurvaAvanco) {
 }
 
 // =========================================================================
+// [INTEGRACAO] CARREGAR ÚLTIMA INTEGRAÇÃO AO SELECIONAR PROJETO (ZOOM)
+// =========================================================================
+/**
+ * Fluxo resumido:
+ * 1) Consulta o dataset dsgestaoOperacional (OPERACAO=consultar) por tipo/bloco.
+ * 2) Escolhe o registro mais recente (critério: RECMODIFIEDON quando disponível).
+ * 3) Preenche apenas registros com EFETIVADO = 0.
+ * 4) Recalcula desvios e formata números.
+ */
+function loadLastIntegrationForProject() {
+    console.log('[INTEGRACAO][LOAD] Iniciando carregamento da última integração...');
+
+    try {
+        var codColigada = getCampo('CODCOLIGADA');
+        var codPrj = getCampo('CODPRJ');
+        var idPrj = getCampo('IDPRJ');
+
+        if (!codColigada || !codPrj || !idPrj) {
+            console.warn('[INTEGRACAO][LOAD] Dados do projeto incompletos. Abortando carregamento.');
+            return;
+        }
+
+        // Competência base: usa campo preenchido ou calcula via helper existente
+        var competencia = getCampo('COMPETENCIAREFERENCIA') || buscarCompetenciaAtual();
+        var partes = String(competencia).split('/');
+        var mes = parseInt(partes[0], 10);
+        var ano = parseInt(partes[1], 10);
+
+        var tipos = [
+            'SSMA',
+            'HISTOGRAMA',
+            'HISTOGRAMA_AUXILIAR',
+            'INFORMACOES_FISICAS',
+            'CURVA_AVANCO'
+        ];
+
+        tipos.forEach(function(tipo) {
+            var registros = fetchDatasetByTipo(tipo, codColigada, codPrj, idPrj, mes, ano, competencia);
+            if (!registros.length) {
+                console.log('[INTEGRACAO][LOAD] Nenhum registro encontrado para tipo:', tipo);
+                return;
+            }
+
+            var latest = pickLatestIntegrationRecords(registros, tipo);
+            if (!latest.latestRecords.length) {
+                console.log('[INTEGRACAO][LOAD] Nenhum registro selecionado após pickLatest para tipo:', tipo);
+                return;
+            }
+
+            fillTablesByTipo(tipo, latest.latestRecords);
+        });
+
+        // Pós-preenchimento: recalcula e formata
+        if (typeof computeHistogramDesvio === 'function') computeHistogramDesvio();
+        if (typeof computeFisicoDesvio === 'function') computeFisicoDesvio();
+        if (typeof formatAllTablesNumbersBR === 'function') formatAllTablesNumbersBR();
+
+    } catch (error) {
+        console.error('[INTEGRACAO][LOAD] Erro ao carregar última integração:', error);
+        if (typeof FLUIGC !== 'undefined' && FLUIGC.toast) {
+            FLUIGC.toast({
+                title: 'Erro',
+                message: 'Erro ao carregar última integração: ' + error.message,
+                type: 'danger'
+            });
+        }
+    }
+}
+
+// =========================================================================
+// [INTEGRACAO] HELPERS DE CONSULTA + ESCOLHA DO REGISTRO MAIS RECENTE
+// =========================================================================
+function fetchDatasetByTipo(tipo, codColigada, codPrj, idPrj, mes, ano, competencia) {
+    try {
+        var constraints = [
+            DatasetFactory.createConstraint('OPERACAO', 'consultar', null, ConstraintType.MUST),
+            DatasetFactory.createConstraint('TIPO', tipo, null, ConstraintType.MUST),
+            DatasetFactory.createConstraint('CODCOLIGADA', codColigada, null, ConstraintType.MUST),
+            DatasetFactory.createConstraint('CODPRJ', codPrj, null, ConstraintType.MUST),
+            DatasetFactory.createConstraint('IDPRJ', idPrj, null, ConstraintType.MUST),
+            DatasetFactory.createConstraint('MES', String(mes), null, ConstraintType.MUST),
+            DatasetFactory.createConstraint('ANO', String(ano), null, ConstraintType.MUST),
+            DatasetFactory.createConstraint('COMPETENCIA', competencia, null, ConstraintType.MUST)
+        ];
+
+        var dataset = DatasetFactory.getDataset('dsgestaoOperacional', null, constraints, null);
+        if (!dataset || !dataset.values) return [];
+        return dataset.values;
+    } catch (error) {
+        console.error('[INTEGRACAO][LOAD] Erro ao consultar dataset para tipo:', tipo, error);
+        return [];
+    }
+}
+
+function parseDateMaybe(value) {
+    if (!value) return null;
+    var date = new Date(value);
+    if (!isNaN(date.getTime())) return date.getTime();
+
+    // Fallback: tenta DD/MM/YYYY
+    var match = String(value).match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    if (match) {
+        var iso = match[3] + '-' + match[2] + '-' + match[1];
+        var dateFallback = new Date(iso);
+        return isNaN(dateFallback.getTime()) ? null : dateFallback.getTime();
+    }
+    return null;
+}
+
+function pickLatestIntegrationRecords(records, tipo) {
+    var criterion = '';
+    var latestRecords = [];
+
+    // 1) Preferência: RECMODIFIEDON
+    var timestamps = records
+        .map(function(r) { return parseDateMaybe(r.RECMODIFIEDON); })
+        .filter(function(ts) { return ts !== null; });
+
+    if (timestamps.length) {
+        var maxTs = Math.max.apply(null, timestamps);
+        latestRecords = records.filter(function(r) { return parseDateMaybe(r.RECMODIFIEDON) === maxTs; });
+        criterion = 'RECMODIFIEDON';
+        console.log('[INTEGRACAO][PICK_LATEST]', { tipo: tipo, criterio: criterion, valor: maxTs });
+        return { criterion: criterion, latestRecords: latestRecords };
+    }
+
+    // 2) Fallback: CHAVE (se existir no retorno)
+    var hasChave = records.some(function(r) { return r.CHAVE; });
+    if (hasChave) {
+        var maxChave = records.reduce(function(acc, r) {
+            return String(r.CHAVE) > String(acc) ? r.CHAVE : acc;
+        }, records[0].CHAVE);
+        latestRecords = records.filter(function(r) { return String(r.CHAVE) === String(maxChave); });
+        criterion = 'CHAVE';
+        console.log('[INTEGRACAO][PICK_LATEST]', { tipo: tipo, criterio: criterion, valor: maxChave });
+        return { criterion: criterion, latestRecords: latestRecords };
+    }
+
+    // 3) Fallback final: mantém todos (mes/ano/competência já filtrados)
+    criterion = 'COMPETENCIA';
+    latestRecords = records;
+    console.log('[INTEGRACAO][PICK_LATEST]', { tipo: tipo, criterio: criterion, valor: 'MES/ANO/COMPETENCIA' });
+    return { criterion: criterion, latestRecords: latestRecords };
+}
+
+// =========================================================================
+// [INTEGRACAO] HELPERS DE PREENCHIMENTO (EFETIVADO = 0)
+// =========================================================================
+function shouldSkipEfetivado(record) {
+    var efetivado = record.EFETIVADO;
+    return efetivado !== undefined && efetivado !== null && String(efetivado) !== '0';
+}
+
+function formatValueForInput(value) {
+    if (typeof formatarValor === 'function') return formatarValor(value);
+    if (value === null || value === undefined || value === 'null' || value === 'undefined') return '';
+    return String(value);
+}
+
+function formatDateForInput(value) {
+    if (typeof formatarDataBR === 'function') return formatarDataBR(value);
+    if (!value || value === 'null' || value === 'undefined') return '';
+    if (String(value).includes('/')) return value;
+    if (String(value).includes('-')) {
+        var partes = String(value).split('-');
+        return partes.length === 3 ? (partes[2] + '/' + partes[1] + '/' + partes[0]) : value;
+    }
+    return String(value);
+}
+
+function fillTablesByTipo(tipo, records) {
+    switch (tipo) {
+        case 'SSMA':
+            fillSSMATable(records);
+            break;
+        case 'HISTOGRAMA':
+            fillHistogramaTable(records);
+            break;
+        case 'HISTOGRAMA_AUXILIAR':
+            fillHistogramaAuxTable(records);
+            break;
+        case 'INFORMACOES_FISICAS':
+            fillFisicoTable(records);
+            break;
+        case 'CURVA_AVANCO':
+            fillCurvaTable(records);
+            break;
+        default:
+            console.warn('[INTEGRACAO][FILL] Tipo desconhecido:', tipo);
+    }
+}
+
+function fillSSMATable(records) {
+    var table = document.getElementById('ssma-table');
+    if (!table) return;
+
+    var rows = table.querySelectorAll('tbody tr');
+    records.forEach(function(registro) {
+        if (shouldSkipEfetivado(registro)) {
+            console.log('[INTEGRACAO][SKIP_EFETIVADO] SSMA', registro.NOME_CATEGORIA);
+            return;
+        }
+
+        var categoria = (registro.NOME_CATEGORIA || '').trim();
+        rows.forEach(function(row) {
+            var label = row.querySelector('.ssma-label');
+            if (label && label.textContent.trim() === categoria) {
+                var inputs = row.querySelectorAll('.ssma-input');
+                if (inputs.length >= 2) {
+                    inputs[0].value = formatValueForInput(registro.META);
+                    inputs[1].value = formatValueForInput(registro.RESULTADO);
+                    console.log('[INTEGRACAO][FILL] SSMA', categoria);
+                }
+            }
+        });
+    });
+}
+
+function fillHistogramaTable(records) {
+    var table = document.getElementById('hist-table');
+    if (!table) return;
+
+    var rows = table.querySelectorAll('tbody tr');
+    records.forEach(function(registro) {
+        if (shouldSkipEfetivado(registro)) {
+            console.log('[INTEGRACAO][SKIP_EFETIVADO] HISTOGRAMA', registro.NOME_CATEGORIA);
+            return;
+        }
+
+        var categoria = (registro.NOME_CATEGORIA || '').trim();
+        rows.forEach(function(row) {
+            var label = row.querySelector('.hist-rowhead');
+            if (label && label.textContent.trim() === categoria) {
+                var inputs = row.querySelectorAll('.hist-input');
+                if (inputs.length >= 4) {
+                    inputs[0].value = formatValueForInput(registro.MAO_DE_OBRA_INDIRETA);
+                    inputs[1].value = formatValueForInput(registro.MAO_DE_OBRA_DIRETA);
+                    inputs[2].value = formatValueForInput(registro.EQUIPAMENTOS);
+                    inputs[3].value = formatValueForInput(registro.VEICULOS);
+                    console.log('[INTEGRACAO][FILL] HISTOGRAMA', categoria);
+                }
+            }
+        });
+    });
+}
+
+function fillHistogramaAuxTable(records) {
+    var table = document.getElementById('hh-table');
+    if (!table) return;
+
+    var rows = table.querySelectorAll('tbody tr');
+    rows.forEach(function(row) {
+        var labels = row.querySelectorAll('.hh-label');
+        var inputs = row.querySelectorAll('.excel-input');
+
+        labels.forEach(function(label, idx) {
+            var categoria = (label.textContent || '').trim();
+            var registro = records.find(function(r) {
+                return (r.NOME_CATEGORIA || '').trim() === categoria;
+            });
+
+            if (!registro) return;
+            if (shouldSkipEfetivado(registro)) {
+                console.log('[INTEGRACAO][SKIP_EFETIVADO] HISTOGRAMA_AUX', categoria);
+                return;
+            }
+
+            if (inputs[idx]) {
+                inputs[idx].value = formatValueForInput(registro.VALOR_CATEGORIA);
+                console.log('[INTEGRACAO][FILL] HISTOGRAMA_AUX', categoria);
+            }
+        });
+    });
+}
+
+function fillFisicoTable(records) {
+    var table = document.getElementById('fisico-table');
+    if (!table) return;
+
+    var rows = table.querySelectorAll('tbody tr');
+    records.forEach(function(registro) {
+        if (shouldSkipEfetivado(registro)) {
+            console.log('[INTEGRACAO][SKIP_EFETIVADO] FISICO', registro.NOME_CATEGORIA);
+            return;
+        }
+
+        var categoria = (registro.NOME_CATEGORIA || '').trim();
+        rows.forEach(function(row) {
+            var label = row.querySelector('.fisico-rowhead');
+            if (label && label.textContent.trim() === categoria) {
+                var inputs = row.querySelectorAll('.excel-input');
+                if (inputs.length >= 3) {
+                    inputs[0].value = formatDateForInput(registro.INICIO);
+                    inputs[1].value = formatDateForInput(registro.TERMINO);
+                    inputs[2].value = formatValueForInput(registro.AV_FISICO);
+                    console.log('[INTEGRACAO][FILL] FISICO', categoria);
+                }
+            }
+        });
+    });
+}
+
+function getCurveRowPeriodValue(row) {
+    var periodCell = row.cells[0];
+    if (!periodCell) return '';
+    var select = periodCell.querySelector('select.curve-period');
+    if (select) return select.value || '';
+    var input = periodCell.querySelector('input');
+    if (input) return input.value || '';
+    return (periodCell.textContent || '').trim();
+}
+
+function fillCurvaTable(records) {
+    var table = document.getElementById('curve-table');
+    if (!table) return;
+
+    var rows = Array.from(table.querySelectorAll('tbody tr'));
+    records.forEach(function(registro) {
+        if (shouldSkipEfetivado(registro)) {
+            console.log('[INTEGRACAO][SKIP_EFETIVADO] CURVA', registro.PERIODO);
+            return;
+        }
+
+        var periodo = (registro.PERIODO || '').trim();
+        var row = rows.find(function(r) {
+            return getCurveRowPeriodValue(r).trim() === periodo;
+        });
+
+        if (!row) return;
+
+        var inputs = row.querySelectorAll('input.curve-input');
+        if (inputs.length >= 6) {
+            inputs[0].value = formatValueForInput(registro.PREV_ACC);
+            inputs[1].value = formatValueForInput(registro.REPLAN_ACC);
+            inputs[2].value = formatValueForInput(registro.REAL_ACC);
+            inputs[3].value = formatValueForInput(registro.PREV_LB_SEM);
+            inputs[4].value = formatValueForInput(registro.REPLAN_SEM);
+            inputs[5].value = formatValueForInput(registro.REAL_SEM);
+        }
+
+        // Ano
+        var anoSelect = row.querySelector('select.curve-year');
+        var anoInput = row.querySelector('input.curve-input-ano');
+        if (anoSelect) anoSelect.value = registro.ANO || '';
+        if (anoInput) anoInput.value = registro.ANO || '';
+
+        // Semana (geralmente o último input .curve-input)
+        if (inputs.length >= 7) {
+            inputs[6].value = registro.SEMANA || '';
+        }
+
+        console.log('[INTEGRACAO][FILL] CURVA', periodo);
+    });
+}
+
+// =========================================================================
 // SSMA - VERIFICA CADA CATEGORIA INDIVIDUALMENTE
 // =========================================================================
 function salvarSSMA(dados, codColigada, codPrj, idPrj, mes, ano, competencia,chave, usuario) {
@@ -519,6 +939,7 @@ function salvarSSMA(dados, codColigada, codPrj, idPrj, mes, ano, competencia,cha
                 console.log('→ Operação:', operacao);
 
                 // Monta constraints
+                var desvios = getDesvioInicioTerminoFromTela('SSMA');
                 var constraints = [
                     DatasetFactory.createConstraint('OPERACAO', operacao, null, ConstraintType.MUST),
                     DatasetFactory.createConstraint('TIPO', 'SSMA', null, ConstraintType.MUST),
@@ -532,6 +953,8 @@ function salvarSSMA(dados, codColigada, codPrj, idPrj, mes, ano, competencia,cha
                     DatasetFactory.createConstraint('NOME_CATEGORIA', item.NOME_CATEGORIA, null, ConstraintType.MUST),
                     DatasetFactory.createConstraint('META', item.META.toString(), null, ConstraintType.MUST),
                     DatasetFactory.createConstraint('RESULTADO', item.RESULTADO.toString(), null, ConstraintType.MUST),
+                    DatasetFactory.createConstraint('DESVIO_INICIO', desvios.DESVIO_INICIO, null, ConstraintType.MUST),
+                    DatasetFactory.createConstraint('DESVIO_TERMINO', desvios.DESVIO_TERMINO, null, ConstraintType.MUST),
                     DatasetFactory.createConstraint('USUARIO', usuario, null, ConstraintType.MUST)
                 ];
 
@@ -600,6 +1023,7 @@ function salvarHistograma(dados, codColigada, codPrj, idPrj, mes, ano, competenc
                 var operacao = jaExiste ? 'atualizar' : 'incluir';
                 console.log('→ Operação:', operacao);
 
+                var desvios = getDesvioInicioTerminoFromTela('HISTOGRAMA');
                 var constraints = [
                     DatasetFactory.createConstraint('OPERACAO', operacao, null, ConstraintType.MUST),
                     DatasetFactory.createConstraint('TIPO', 'HISTOGRAMA', null, ConstraintType.MUST),
@@ -615,6 +1039,8 @@ function salvarHistograma(dados, codColigada, codPrj, idPrj, mes, ano, competenc
                     DatasetFactory.createConstraint('MAO_DE_OBRA_DIRETA', item.MAO_DE_OBRA_DIRETA.toString(), null, ConstraintType.MUST),
                     DatasetFactory.createConstraint('EQUIPAMENTOS', item.EQUIPAMENTOS.toString(), null, ConstraintType.MUST),
                     DatasetFactory.createConstraint('VEICULOS', item.VEICULOS.toString(), null, ConstraintType.MUST),
+                    DatasetFactory.createConstraint('DESVIO_INICIO', desvios.DESVIO_INICIO, null, ConstraintType.MUST),
+                    DatasetFactory.createConstraint('DESVIO_TERMINO', desvios.DESVIO_TERMINO, null, ConstraintType.MUST),
                     DatasetFactory.createConstraint('USUARIO', usuario, null, ConstraintType.MUST)
                 ];
 
@@ -690,6 +1116,7 @@ function salvarHistogramaAuxiliar(dados, codColigada, codPrj, idPrj, mes, ano, c
             var operacao = jaExiste ? 'atualizar' : 'incluir';
             console.log('→ Operação:', operacao);
 
+            var desvios = getDesvioInicioTerminoFromTela('HISTOGRAMA_AUXILIAR');
             var constraints = [
                 DatasetFactory.createConstraint('OPERACAO', operacao, null, ConstraintType.MUST),
                 DatasetFactory.createConstraint('TIPO', 'HISTOGRAMA_AUXILIAR', null, ConstraintType.MUST),
@@ -702,6 +1129,8 @@ function salvarHistogramaAuxiliar(dados, codColigada, codPrj, idPrj, mes, ano, c
                 DatasetFactory.createConstraint('CHAVE', chave, null, ConstraintType.MUST),
                 DatasetFactory.createConstraint('NOME_CATEGORIA', item.NOME_CATEGORIA, null, ConstraintType.MUST),
                 DatasetFactory.createConstraint('VALOR_CATEGORIA', item.VALOR_CATEGORIA.toString(), null, ConstraintType.MUST),
+                DatasetFactory.createConstraint('DESVIO_INICIO', desvios.DESVIO_INICIO, null, ConstraintType.MUST),
+                DatasetFactory.createConstraint('DESVIO_TERMINO', desvios.DESVIO_TERMINO, null, ConstraintType.MUST),
                 DatasetFactory.createConstraint('USUARIO', usuario, null, ConstraintType.MUST)
             ];
             
@@ -747,6 +1176,7 @@ function salvarInformacoesFisicas(dados, codColigada, codPrj, idPrj, mes, ano, c
             var operacao = jaExiste ? 'atualizar' : 'incluir';
             console.log('→ Operação:', operacao);
 
+            var desvios = getDesvioInicioTerminoFromTela('INFORMACOES_FISICAS');
             var constraints = [
                 DatasetFactory.createConstraint('OPERACAO', operacao, null, ConstraintType.MUST),
                 DatasetFactory.createConstraint('TIPO', 'INFORMACOES_FISICAS', null, ConstraintType.MUST),
@@ -761,6 +1191,8 @@ function salvarInformacoesFisicas(dados, codColigada, codPrj, idPrj, mes, ano, c
                 DatasetFactory.createConstraint('INICIO', item.INICIO || '', null, ConstraintType.MUST),
                 DatasetFactory.createConstraint('TERMINO', item.TERMINO || '', null, ConstraintType.MUST),
                 DatasetFactory.createConstraint('AV_FISICO', item.AV_FISICO.toString(), null, ConstraintType.MUST),
+                DatasetFactory.createConstraint('DESVIO_INICIO', desvios.DESVIO_INICIO, null, ConstraintType.MUST),
+                DatasetFactory.createConstraint('DESVIO_TERMINO', desvios.DESVIO_TERMINO, null, ConstraintType.MUST),
                 DatasetFactory.createConstraint('USUARIO', usuario, null, ConstraintType.MUST)
             ];
             
@@ -813,6 +1245,7 @@ function salvarCurvaAvanco(dados, codColigada, codPrj, idPrj, mes, ano, competen
                 var operacao = jaExiste ? 'atualizar' : 'incluir';
                 console.log('→ Operação:', operacao);
 
+                var desvios = getDesvioInicioTerminoFromTela('CURVA_AVANCO');
                 var constraints = [
                     DatasetFactory.createConstraint('OPERACAO', operacao, null, ConstraintType.MUST),
                     DatasetFactory.createConstraint('TIPO', 'CURVA_AVANCO', null, ConstraintType.MUST),
@@ -833,6 +1266,8 @@ function salvarCurvaAvanco(dados, codColigada, codPrj, idPrj, mes, ano, competen
                     DatasetFactory.createConstraint('SEMANA', item.SEMANA, null, ConstraintType.MUST),
                     DatasetFactory.createConstraint('USUARIO', usuario, null, ConstraintType.MUST),
                     DatasetFactory.createConstraint('ANO_CURVA', item.ANO, null, ConstraintType.MUST),
+                    DatasetFactory.createConstraint('DESVIO_INICIO', desvios.DESVIO_INICIO, null, ConstraintType.MUST),
+                    DatasetFactory.createConstraint('DESVIO_TERMINO', desvios.DESVIO_TERMINO, null, ConstraintType.MUST),
 
                 ];
 

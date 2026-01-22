@@ -22,6 +22,16 @@ function setSelectedZoomItem(selectedItem){
 			$("#REVISAO").val(selectedItem["REVISAO"]);
 
 			ws.initSession();
+
+			// ===================================================================
+			// [INTEGRACAO] Carregar última integração do projeto selecionado
+			// - Executa somente se a função estiver disponível (fail-safe).
+			// ===================================================================
+			if (typeof loadLastIntegrationForProject === "function") {
+				loadLastIntegrationForProject();
+			} else {
+				console.warn("[INTEGRACAO][LOAD] loadLastIntegrationForProject() não encontrada.");
+			}
 		
 		}
 	

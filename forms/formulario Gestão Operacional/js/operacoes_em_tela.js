@@ -26,6 +26,60 @@ var integrar = false;
 //const table = document.querySelector('#ssma-table');
 //const  histTable = document.querySelector('#hist-table');
  
+/** =================================================================================================
+ * HOT-SKIN (Handsontable-like) - APLICAÇÃO DE CLASSES + BLOQUEIO DE AÇÕES DE LINHA
+ * -------------------------------------------------------------------------------------------------
+ * Objetivo:
+ * - Garantir que as tabelas alvo (exceto Curva) recebam a classe .hot-skin-table.
+ * - Bloquear ações de adicionar/remover linhas em tabelas "hot-skin", caso existam botões.
+ *
+ * Observações:
+ * - NÃO altera estrutura nem regras de cálculo.
+ * - NÃO afeta #curve-table (Curva de Avanço).
+ * ================================================================================================= */
+function applyHotSkinTables() {
+  console.log('[HOT-SKIN] Aplicando classe .hot-skin-table nas tabelas alvo...');
+
+  const tableIds = [
+    'ssma-table',
+    'fisico-table',
+    'hist-table',
+    'hh-table'
+  ];
+
+  tableIds.forEach((id) => {
+    const table = document.getElementById(id);
+    if (!table) {
+      console.warn(`[HOT-SKIN] Tabela #${id} não encontrada.`);
+      return;
+    }
+    table.classList.add('hot-skin-table');
+  });
+}
+
+function blockHotSkinRowActions() {
+  console.log('[HOT-SKIN] Bloqueando ações de adicionar/remover linha nas tabelas hot-skin.');
+
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('.btn-add-row, .btn-remove-row, .btn-add, .btn-remove');
+    if (!button) return;
+
+    // Bloqueia somente se o botão estiver dentro de uma tabela hot-skin
+    const hotTable = button.closest('.hot-skin-table');
+    if (!hotTable) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    console.warn('[HOT-SKIN][BLOCK_ROW_ACTION] Ação de linha bloqueada em tabela hot-skin.');
+    return false;
+  }, true);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyHotSkinTables();
+  blockHotSkinRowActions();
+});
+
 
 
 /**
