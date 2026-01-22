@@ -1,0 +1,90 @@
+/* =================================================================================================
+ * Arquivo: hot-skin.css
+ * Objetivo: Aplicar um “skin” visual estilo Handsontable nas tabelas específicas do formulário,
+ *           sem alterar estrutura/inputs/regra de cálculo. A Curva de Avanço NÃO é afetada.
+ *
+ * Observações:
+ * - Estilos são escopados por .hot-skin-table para evitar impacto global.
+ * - Mantém aparência de planilha moderna: grid leve, zebra, hover, header destacado e foco.
+ * - Não altera DOM nem lógica; apenas estilo.
+ * ================================================================================================ */
+
+/* ===== Base da tabela "hot-skin" ===== */
+.hot-skin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+}
+
+/* ===== Cabeçalho destacado ===== */
+.hot-skin-table thead th {
+  background: #f8fafc;
+  color: #1f2937;
+  font-weight: 600;
+  text-transform: none;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* ===== Células com grid leve ===== */
+.hot-skin-table th,
+.hot-skin-table td {
+  padding: 8px 10px;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+}
+
+.hot-skin-table th:last-child,
+.hot-skin-table td:last-child {
+  border-right: 0;
+}
+
+/* ===== Zebra (linhas alternadas) ===== */
+.hot-skin-table tbody tr:nth-child(even) {
+  background: #f9fbfd;
+}
+
+/* ===== Hover suave ===== */
+.hot-skin-table tbody tr:hover {
+  background: #eef6ff;
+}
+
+/* ===== Foco/seleção de célula ===== */
+.hot-skin-table td:focus-within {
+  outline: 2px solid #93c5fd;
+  outline-offset: -2px;
+  background: #eff6ff;
+}
+
+/* ===== Inputs dentro da tabela ===== */
+.hot-skin-table td input,
+.hot-skin-table td select,
+.hot-skin-table td textarea {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 2px 0;
+  outline: none;
+  box-shadow: none;
+}
+
+.hot-skin-table td input:focus,
+.hot-skin-table td select:focus,
+.hot-skin-table td textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ===== Remoção visual de botões de linha dentro das tabelas hot-skin ===== */
+.hot-skin-table .btn-add-row,
+.hot-skin-table .btn-remove-row,
+.hot-skin-table .btn-add,
+.hot-skin-table .btn-remove {
+  display: none !important;
+}
+
