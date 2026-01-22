@@ -1,0 +1,3090 @@
+
+/* =========================================================
+   VARIÁVEIS GLOBAIS (CSS Custom Properties)
+   ---------------------------------------------------------
+   Centralizam cores, espaçamentos e dimensões usadas no tema.
+   Facilita manutenção, rebranding e consistência visual.
+   ========================================================= */
+:root {
+  /* Unidade base para espaçamentos em grids */
+  --base-grid: 0.5rem;
+
+  /* Cores neutras de texto/fundo */
+  --colour-white: #fff;
+  --colour-black: #1a1a1a;
+
+  /* Cor vermelha (aponta para --color1) e gradiente padrão de botão */
+  --color-red: var(--color1);
+  --button-gradient: linear-gradient(90deg, #EE145B 0%, var(--color1) 100%);
+
+  /* Paleta laranja utilizada como primária */
+  --orange: #b92113;
+  --orange2: #b92113ad; /* Variante com alfa (transparência) */
+  --color1: var(--orange);
+  --color2: var(--orange2);
+  --color3: var(--colour-white);
+
+  /* Paleta “nomeada” para uso semântico */
+  --cor-primaria: #CB0F10;       /* Primária para botões/realces */
+  --cor-secundaria: #6c757d;     /* Secundária (cinza) */
+  --cor-confirmacao: #28a745;    /* Sucesso/confirmar ações */
+  --cor-aviso: #ffc107;          /* Aviso/atenção */
+  --cor-cinza-fundo: #f0f0f0;    /* Fundo geral da página */
+  --cor-texto-escuro: #212529;   /* Texto padrão escuro */
+  --cor-texto-claro: #495057;    /* Texto secundário */
+  --cor-cinza-coluna-congelada: #f1f3f5;         /* Fundo de coluna congelada */
+  --cor-cinza-coluna-congelada-hover: #e9ecef;   /* Hover em coluna congelada */
+
+  /* Dimensões padrão para layout (side/top bar) com clamp responsivo */
+  --largura-sidebar: clamp(4rem, 8vw, 6rem);
+  --altura-topbar: clamp(3rem, 6vh, 3.75rem);
+
+  /* Cores específicas de sidebar/topbar */
+  --cor-sidebar-fundo: #505050;
+  --cor-sidebar-texto: #f0f0f0;
+  --cor-sidebar-hover: #656565;
+  --cor-topbar-fundo: #edebe8;
+}
+
+/* =========================================================
+   BODY (estrutura geral da página)
+   ---------------------------------------------------------
+   Define fonte padrão, background e comportamento de overflow.
+   Aplica imagem de fundo fixa (cover) para identidade visual.
+   ========================================================= */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  background-color: var(--cor-cinza-fundo) !important;
+  margin: 0 !important;
+  padding-top: 0px !important;
+  padding-left: 2vw !important;        /* respiro lateral */
+  position: relative;
+  overflow-x: hidden;                   /* evita scroll horizontal */
+  overflow-y: visible !important;
+
+  /* Imagem de fundo com efeito parallax leve */
+  background-image: url('imagens/bg.png');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+}
+
+/* =========================================================
+   CONTAINER PRINCIPAL (.container2)
+   ---------------------------------------------------------
+   Card principal com bordas arredondadas e sombra.
+   Flex column para empilhar header + conteúdo.
+   ========================================================= */
+.container2 {
+  
+  max-width: 96vw !important;
+  background: white !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* =========================================================
+   HEADER (faixa superior do card)
+   ---------------------------------------------------------
+   Usa a cor primária e cantos superiores arredondados.
+   ========================================================= */
+.header {
+  background: var(--cor-primaria);
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+  height: 150px ; /* define altura fixa */
+  border-radius: 1.25rem 1.25rem 0 0;
+}
+.header h1 {
+  font-size: clamp(1.5rem, 2.2vw, 2.2rem);
+  margin: 0;
+  font-weight: bold;
+}
+
+/* =========================================================
+   MAIN CONTENT (área central de trabalho)
+   ---------------------------------------------------------
+   Espaçamento interno e margem inferior para rodapés fixos.
+   ========================================================= */
+.main-content {
+  padding: 1.25rem;
+  flex-grow: 1;
+  /* overflow-y: auto;  // descomentando, permite scroll interno */
+  position: relative;
+  margin-bottom: 5vh;
+}
+
+/* =========================================================
+   FORM: grupamento e rótulos
+   ---------------------------------------------------------
+   Margem inferior entre grupos e label visível com peso.
+   ========================================================= */
+.form-group {
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--cor-texto-claro);
+}
+
+/* =========================================================
+   SELECT2 / ELEMENTOS DE SELEÇÃO
+   ---------------------------------------------------------
+   Estilo de inputs “select” customizados (ex.: select2).
+   ========================================================= */
+/* select {
+  display: block !important;
+} */
+.form-select2 {
+  width: 100%;
+  padding: 0.75rem;
+  border: 0.063rem solid #ced4da;
+  border-radius: 0.5rem;
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  background: #fdfdff;
+  transition: border-color 0.2s;
+}
+.form-select2:focus,
+.select2-selection--multiple:focus {
+  outline: none !important;
+  border-color: var(--cor-primaria) !important;
+  box-shadow: 0 0 0 0.125rem rgba(203, 15, 16, 0.2) !important;
+}
+
+/* =========================================================
+   BOTÕES PADRÃO (.btn2) + VARIAÇÕES
+   ---------------------------------------------------------
+   Dimensões responsivas, tipografia e transição suave.
+   ========================================================= */
+.btn2 {
+  color: white !important;
+  border: none !important;
+  padding: clamp(0.4rem, 1vw, 0.75rem) clamp(0.6rem, 1.2vw, 1rem) !important;
+  border-radius: clamp(0.3rem, 0.8vw, 0.5rem) !important;
+  font-size: clamp(0.7rem, 1.1vw, 1rem) !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  height: clamp(2.2rem, 6vh, 3.2rem) !important;
+}
+/* Versão anterior mantida como referência:
+.btn2 {
+  ...
+} */
+
+/* Botão “adicionar” usa a primária */
+.btn-add {
+  background: var(--cor-primaria) !important;
+}
+
+/* Botão “danger” (vermelho) coerente com paleta primária */
+.btn-danger {
+  background-color: var(--cor-primaria);
+}
+.btn-danger:hover {
+  background-color: #a00c0d; /* leve escurecimento no hover */
+}
+
+/* =========================================================
+   BLOCO DE SETUP INICIAL (wizard stage 1)
+   ---------------------------------------------------------
+   Container centralizado com borda leve e fundo claro.
+   Botão ocupa largura total em mobile.
+   ========================================================= */
+.initial-setup {
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  background: #f8f9fa;
+  border: 0.063rem solid #eee;
+  border-radius: 0.938rem;
+  max-width: 90%;
+  /* margin: 2rem 35rem 2rem 35rem;  // antigo */
+  margin: 2rem 20% 2rem 20%;
+  text-align: center;
+}
+.initial-setup .btn2 {
+  width: 100%;
+  /* margin-top: 1.25rem; */
+  margin-top: 3vh;
+  font-size: clamp(0.9rem, 2vw, 1rem) !important;
+}
+
+/* =========================================================
+   RESPONSIVIDADE (breakpoints)
+   ---------------------------------------------------------
+   Ajustes para <=768px e >=1000px / >=1300px
+   otimizando select2 e layout.
+   ========================================================= */
+/* <= 768px: remove padding lateral e compacta header */
+@media (max-width: 768px) {
+  body { padding-left: 0; }
+  .header { padding: 1rem; }
+}
+/* >= 1000px: controla largura de “chips” do select2 e oculta campo de busca inline */
+@media (min-width:1000px) {
+  .select2-selection__choice {
+    max-width: 30ch !important;      /* limita tamanho do chip */
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+  .select2-search,
+  .select2-search--inline { width: 0% !important; } /* esconde input inline */
+}
+/* >= 1300px: aumenta limite de largura dos chips */
+@media (min-width:1300px) {
+  .select2-selection__choice {
+    max-width: 50ch !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+  .select2-search,
+  .select2-search--inline { width: 0% !important; }
+}
+
+/* =========================================================
+   ZOOM FLUIG (ícones/estados)
+   ---------------------------------------------------------
+   Cor de fundo/ícones do botão de zoom e interações.
+   ========================================================= */
+.select2-fluigicon-zoom {
+  background-color: var(--color1) !important;
+  z-index: 2 !important;
+}
+/* Corrige altura e margin padrão do input de busca */
+input:not([type]),
+input[type=search]:not(.browser-default){
+  height: inherit !important;
+  margin-bottom: 0px !important;
+}
+/* Cor dos ícones de zoom/remover */
+.fluigicon-zoom-in,
+.fluigicon-remove{
+  color: var(--color3) !important;
+}
+/* Centraliza ícone de zoom */
+.selection .fluigicon .fluigicon-zoom-in{
+  display: flex;
+  align-items: center;
+}
+/* Ícones em cabeçalhos colapsáveis: gira no ativo e aplica animação/cor */
+li.active .collapsible-header .fluigicon{
+  rotate:180deg;
+  animation: anim7 0.5s;
+  color:var(--color1);
+}
+
+/* =========================================================
+   PAINEL DE INFO (título/aviso) + posicionamento
+   ---------------------------------------------------------
+   Texto em destaque e leve ajuste de margem.
+   ========================================================= */
+#info-painel {
+  font-weight: bold !important;
+  font-size: 1.5rem !important;
+  color: var(--colour-black) !important;
+  margin-bottom: 80px;
+}
+#info-painel-aviso {
+  color: var(--colour-black) !important;
+}
+.info-painel {
+  margin-left: 2vh !important;
+}
+
+/* =========================================================
+   ÁREA DE IMPORTAÇÃO DE PLANILHA
+   ---------------------------------------------------------
+   Ajuste de margens externas para separação visual.
+   ========================================================= */
+.importar-planilha {
+  margin: 3vh 2vh !important;
+}
+
+/* =========================================================
+   CONTAINER DE DADOS (Excel/Tabelas)
+   ---------------------------------------------------------
+   Espaço para rodapé, altura mínima e controle de colunas extras.
+   ========================================================= */
+#excel-data-container {
+  position: relative;
+  padding-bottom: 50px;   /* espaço para resumo/rodapé */
+  min-height: 400px;
+  margin-top: 20px;
+}
+/* Colunas extras iniciam ocultas */
+#excel-data-container .extra-col { display: none; }
+/* Classe que exibe todas as colunas extras */
+#excel-data-container.show-all-columns .extra-col { display: table-cell; }
+
+/* =========================================================
+   WRAPPERS SCROLLABLE PARA TABELAS
+   ---------------------------------------------------------
+   Bordas, raio e fundo/hover das linhas.
+   ========================================================= */
+.scrollable-table-container,
+.scrollable-table-container2 {
+  /* overflow: auto; */
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+}
+.scrollable-table-container .contract-table,
+.scrollable-table-container2 .contract-table {
+  background-color: #fff;
+}
+/* Efeito hover nas linhas de tabela */
+.scrollable-table-container .contract-table tbody tr:hover,
+.scrollable-table-container2 .contract-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* =========================================================
+   CONTAINER DA TABELA DE CONTRATOS
+   ---------------------------------------------------------
+   Espaçamento para rodapé “sticky”.
+   ========================================================= */
+#contract-table-container {
+  display: block;
+  position: relative;
+  padding-bottom: 50px;
+}
+
+/* =========================================================
+   TABELA DE CONTRATOS: base
+   ---------------------------------------------------------
+   Tabela com border-collapse: separate (para stickies),
+   tipografia e espaçamentos padronizados.
+   ========================================================= */
+.contract-table {
+  width: 100%;
+  /* border-collapse: collapse; */
+  border-collapse: separate !important; /* permite sticky thead/tfoot com sombra */
+  font-size: 0.9rem;
+}
+.contract-table th,
+.contract-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+  white-space: nowrap;      /* evita quebra em células */
+  vertical-align: middle;
+}
+/* Evita duplo padding quando não há input editável dentro da célula */
+.contract-table td:not(:has(> .editable-input)) {
+  padding: 12px 15px !important;
+}
+/* Cabeçalho com fundo e z-index maior (compatível com sticky) */
+.contract-table thead th {
+  background-color: #e9ecef;
+  font-weight: 600;
+  padding: 12px 15px;
+  /* position: sticky;
+     top: 0; */
+  z-index: 3;
+}
+
+/* Células com botão “remover” centralizadas e com padding ajustado */
+.contract-table td:has(> .btn-remove) {
+  padding: 0 15px;
+  text-align: center;
+}
+
+/* (Repetição de estilos para garantir consistência em ambos containers) */
+.scrollable-table-container .contract-table,
+.scrollable-table-container2 .contract-table {
+  background-color: #fff;
+}
+.scrollable-table-container .contract-table tbody tr:hover,
+.scrollable-table-container2 .contract-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* =========================================================
+   TABELA “CONGELADA” (frozen)
+   ---------------------------------------------------------
+   Fundo diferenciado e hover para colunas/linhas congeladas.
+   ========================================================= */
+.frozen-table-container .contract-table th,
+.frozen-table-container .contract-table td {
+  background-color: var(--cor-cinza-coluna-congelada);
+}
+.frozen-table-container .contract-table tbody tr:hover td {
+  background-color: var(--cor-cinza-coluna-congelada-hover);
+}
+
+/* =========================================================
+   INPUTS EDITÁVEIS DENTRO DAS CÉLULAS
+   ---------------------------------------------------------
+   Preenchem toda a célula, herdam tipografia e indicam foco.
+   ========================================================= */
+.contract-table td .editable-input {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 15px !important;
+  border: none !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+}
+.contract-table td .editable-input:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
+}
+.contract-table td .editable-input:focus {
+  outline: 2px solid var(--cor-primaria) !important;
+  outline-offset: -2px !important;
+}
+
+/* =========================================================
+   RODAPÉ (tfoot) E TOTALIZADORES
+   ---------------------------------------------------------
+   Rodapé “sticky” com peso e alinha à direita.
+   ========================================================= */
+.contract-table tfoot td.total-label { text-align: left; }
+.contract-table .numeric-input { text-align: left; }
+.contract-table tfoot {
+  position: sticky;
+  bottom: -1px;   /* adere ao final do container */
+  z-index: 5;
+}
+.contract-table tfoot td {
+  font-weight: bold;
+  background-color: #e9ecef;
+  border-top: 2px solid #adb5bd;
+  padding: 12px 15px;
+  color: var(--cor-texto-escuro);
+  text-align: right;
+}
+
+/* =========================================================
+   RESUMO SUPERIOR (summary-footer)
+   ---------------------------------------------------------
+   Barra de resumo com flex para distribuição de informações.
+   ========================================================= */
+.summary-footer {
+  position: static !important;
+  border-top: none !important;
+  padding: 0 !important;
+  margin-bottom: 10px !important;
+  font-size: 1.1rem !important;
+  font-weight: bold !important;
+  color: var(--cor-texto-escuro) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+/* Ajuste de z-index do thead em tabelas congeladas */
+.frozen-table-container .contract-table thead th { z-index: 4; }
+
+/* Linha totalizadora no cabeçalho (thead) quando necessário */
+.contract-table thead .totalizer-row th {
+  top: 40px;
+  box-shadow: inset 0 -2px 0 #dee2e6;
+  text-align: right;
+}
+
+/* =========================================================
+   CONTADOR DE ERROS (badge)
+   ---------------------------------------------------------
+   Pequena “pílula” com contagem clicável para navegação em erros.
+   ========================================================= */
+.error-counter-badge {
+  display: inline-block;
+  margin-left: 8px;
+  background-color: #ffffff;      
+  color: #dc3545;                  
+  border: 1px solid #dc3545;  
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 0.8em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.error-counter-badge:hover {
+  transform: scale(1.1);
+}
+
+/* =========================================================
+   COMPATIBILIZAÇÃO COM “Fluig Style Guide”
+   ---------------------------------------------------------
+   Inputs editáveis com estilo aplicado dentro do guia do Fluig.
+   ========================================================= */
+.fluig-style-guide .editable-input {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 12px 15px !important;
+  border: none !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  color: var(--colour-black) !important;
+  box-sizing: border-box !important;
+}
+/* Foco/estado readonly/disabled padrão */
+.editable-input:focus {
+  outline: 2px solid var(--cor-primaria);
+  outline-offset: -2px;
+}
+.editable-input:read-only,
+.editable-input:disabled {
+  background-color: #f1f1f1;
+  cursor: not-allowed;
+}
+
+/* Reafirma estilo de inputs editáveis dentro de células na área Fluig */
+.fluig-style-guide .contract-table td .editable-input {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 12px 15px !important;
+  border: none !important;
+  background-color: transparent !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  color: var(--colour-black) !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+}
+.contract-table td .editable-input:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
+}
+.contract-table td .editable-input:focus {
+  outline: 2px solid var(--cor-primaria) !important;
+  outline-offset: -2px !important;
+}
+
+/* =========================================================
+   COLUNAS OCULTAS (controle por classe)
+   ---------------------------------------------------------
+   Útil para esconder colunas conforme perfil/regra de negócio.
+   ========================================================= */
+.hidden-col { display: none; }
+
+/* =========================================================
+   RODAPÉS FIXOS (sticky footers)
+   ---------------------------------------------------------
+   Barras fixadas no final da viewport com sombra leve.
+   ========================================================= */
+#sticky-footer-wrapper,
+#view-contract-info-footer {
+  position: fixed !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  left: 0 !important;
+  background-color: white !important;
+  padding: 2px 5px !important;
+  border-top: 1px solid #dee2e6 !important;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08) !important;
+  z-index: 10 !important;
+  box-sizing: border-box !important;
+}
+#view-contract-info-footer { 
+  height: auto !important;  /* deixa ajustar ao conteúdo */
+  /* ou se quiser um tamanho fixo: */
+  /* height: 60px !important; */
+  padding: 12px 20px !important;  /* reduz padding também */
+}
+
+/* =========================================================
+   BOTÕES SECUNDÁRIOS
+   ---------------------------------------------------------
+   Estilo para ações secundárias (cinza).
+   ========================================================= */
+.btn-secondary{ display: inline-block !important; }
+.btn-secondary {
+  color: white !important;
+  background: var(--cor-secundaria) !important;
+  margin-bottom: 3vh !important;
+}
+.btn-secondary:hover { background: #5a6268 !important; }
+.fa-credit-card{ color: white !important; }
+
+/* =========================================================
+   LISTA PARA EXCLUSÃO EM LOTE
+   ---------------------------------------------------------
+   Estilos de itens com hover para realçar linha selecionada.
+   ========================================================= */
+.batch-delete-task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 4px;
+}
+.batch-delete-task-item:hover { background-color: #f1f3f5; }
+.batch-delete-task-item label {
+  font-size: 0.95rem !important;
+  font-weight: normal !important;
+  cursor: pointer;
+  margin-bottom: 0px !important;
+}
+
+/* =========================================================
+   AÇÕES EM MODAIS
+   ---------------------------------------------------------
+   Alinhamento à direita e cor branca (herdada em botões).
+   ========================================================= */
+.modal-actions{
+  margin-top: 5vh !important;
+  text-align: end !important;
+  color: white !important;
+}
+
+/* =========================================================
+   BOTÕES DE AÇÃO (remover/confirmar)
+   ---------------------------------------------------------
+   Baseados em paleta secundária, com hover na primária
+   para remover, e verde para confirmar.
+   ========================================================= */
+.btn-remove { background: var(--cor-secundaria); }
+.contract-table td:has(> .btn-remove) {
+  padding: 0 15px;
+  text-align: center;
+}
+.btn-action.btn-remove:hover:not(:disabled) {
+  background-color: var(--cor-primaria);
+  border-color: var(--cor-primaria);
+}
+.btn-confirm { background: var(--cor-confirmacao); }
+.btn-confirm:hover { background: #218838; }
+
+/* =========================================================
+   FEEDBACK DE IMPORTAÇÃO
+   ---------------------------------------------------------
+   Define espaçamento superior para bloco de mensagens pós-import.
+   ========================================================= */
+.import-feedback{
+  margin-top: 4vh !important;
+}
+
+/* =========================================================
+   TABELA DE IMPORTAÇÃO (cores/textos)
+   ---------------------------------------------------------
+   Padroniza texto escuro e alinhamento à esquerda.
+   ========================================================= */
+.table-importacao th,
+.table-importacao td {
+  color: var(--colour-black) !important;
+  text-align: left !important;
+}
+
+/* =========================================================
+   POSICIONAMENTO DE BOTÕES ESPECÍFICOS
+   ---------------------------------------------------------
+   “Avançar” à direita (absoluto) e “Voltar” à esquerda.
+   ========================================================= */
+#avancar {
+  right: 2vw !important;
+  position: absolute !important;
+}
+#voltarImportacao {
+  left: 2vw !important;
+  position: absolute !important;
+  margin-top: 3vh !important;
+}
+
+/* =========================================================
+   FILTRO FLUIG (input group)
+   ---------------------------------------------------------
+   Cor de fundo do addon coerente com primária.
+   ========================================================= */
+.fluig-filter .input-group-addon{
+  background-color: var(--cor-primaria) !important;
+}
+.contract-table th,
+.contract-table td input{
+  color: black !important;
+}
+
+/* =========================================================
+   TOASTS (camada acima de tudo)
+   ---------------------------------------------------------
+   Aumenta z-index para aparecer sobre modais/painéis.
+   ========================================================= */
+.fluig-toast{ z-index: 100000 !important; }
+
+/* =========================================================
+   POSICIONAMENTO DE FILTRO
+   ---------------------------------------------------------
+   Define position: static para evitar overlays indevidos.
+   ========================================================= */
+div .fluig-filter{ position: static !important; }
+
+/* =========================================================
+   TOOLTIP DE ERRO (custom)
+   ---------------------------------------------------------
+   Tooltip fixo com visibilidade controlada por hover,
+   usado para exibir mensagens célula-a-célula na tabela.
+   ========================================================= */
+.error-tooltip {
+  display: none;
+  position: fixed;
+  background-color: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  z-index: 9999 !important;
+  pointer-events: none;
+  max-width: 250px;
+}
+
+/* Alvo de tooltip com atributo data-tooltip (posiciona e ativa) */
+.cell-error[data-tooltip] { position: relative; cursor: help; }
+.cell-error[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 0%;
+  background-color: #333;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  white-space: nowrap;
+  z-index: 10 !important;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+.cell-error[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Estado visual de célula com erro: leve vermelho de fundo e contraste de texto */
+.cell-error {
+  background-color: #f8d7da !important; /* vermelho claro */
+  color: #721c24;                        /* texto escuro para melhor contraste */
+  font-weight: 500;
+  text-align: center;
+}
+
+/* =========================================================
+   TABELAS DE IMPORTAÇÃO/INTEGRAÇÃO (thead sticky)
+   ---------------------------------------------------------
+   Cabeçalhos pegajosos (sticky) para facilitar leitura em scroll.
+   ========================================================= */
+#import-table thead tr,
+#integracao-table thead tr {
+  position: sticky;
+  top: 0;
+  z-index: 10;    /* fica acima das linhas */
+  background: #fff; /* evita transparência */
+}
+/* Linha totalizadora no thead (após primeira linha) */
+#import-table thead tr.totalizer-row {
+  top: 6vh;       /* altura aproximada da primeira linha sticky */
+  z-index: 9;
+}
+
+/* =========================================================
+   AJUSTES EXTRA EM TABELAS
+   ---------------------------------------------------------
+   Border-spacing e display table para compatibilidade com stickies.
+   ========================================================= */
+#import-table,
+#integracao-table{
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  display: table !important;
+}
+.contract-table thead th { background-color: #f8f9fa; }
+
+/* =========================================================
+   SCROLL Y NAS ÁREAS DE TABELA
+   ---------------------------------------------------------
+   Limita altura e habilita scroll vertical, mantendo stickies.
+   ========================================================= */
+.scrollable-table-container{
+  max-height: 70vh;
+  overflow-y: auto;
+  position: relative;
+}
+.scrollable-table-container2{
+  max-height: 70vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* =========================================================
+   MÉTODO DE PAGAMENTO (seção específica)
+   ---------------------------------------------------------
+   Padding interno para respiro visual.
+   ========================================================= */
+.metodoPagamento { padding: 4vh !important; }
+
+/* =========================================================
+   INDICADORES CIRCULARES (verde/branco)
+   ---------------------------------------------------------
+   Usados para marcar estados (selecionado/nao-selecionado).
+   ========================================================= */
+.circuloVerde{
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: #28a745;
+  border-radius: 50%;
+  margin: 0.8em;
+  cursor: pointer;
+}
+.circuloBranco{
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: #cbd3cd;
+  border-radius: 50%;
+  margin: 0.8em;
+  cursor: pointer;
+}
+
+/* =========================================================
+   BOTÕES ESPECÍFICOS (spacing/position)
+   ---------------------------------------------------------
+   Margens para botão de método de pagamento e posição relativa
+   no botão de importar planilha (para ícones/overlay).
+   ========================================================= */
+#payment-method-button{ margin-top: 3vh; }
+#import-spreadsheet-button{ position: relative; }
+
+/* =========================================================
+   CABEÇALHOS CLICÁVEIS (ordenação de colunas)
+   ---------------------------------------------------------
+   UX: cursor pointer + sublinhado no hover + ícone de seta.
+   ========================================================= */
+th.sortable {
+  cursor: pointer; /* mãozinha */
+  position: relative;
+  white-space: nowrap; /* evita quebra */
+}
+/* Sublinhado ao passar mouse */
+th.sortable:hover { text-decoration: underline; }
+/* Ícone de seta ao lado do texto (ordenador visual) */
+th .sort-arrow {
+  margin-left: 6px;  /* aproxima da palavra */
+  font-size: 12px;
+  opacity: 0.8;
+  position: static;  /* <-- IMPORTANTE: deixa ela ao lado do texto */
+}
+
+/* Estilo adicional para células com erro */
+td.has-error {
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+td.has-error:hover {
+    background-color: #ffcdd2 !important;
+    transform: scale(1.02);
+}
+
+
+
+/* Container principal do campo competência - FIXO NO TOPO */
+.competencia-header-wrapper {
+  position: absolute !important;
+  right: 50% !important;
+  top: 25vh !important;
+  transform: translateX(50%) !important;
+  z-index: 50 !important;
+  background: white !important;
+  padding: 20px 40px !important;
+  border-radius: 4px !important;
+  border: 3px solid var(--cor-primaria) !important;
+  min-width: 320px !important;
+  max-width: 500px !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  /* INVISÍVEL POR PADRÃO */
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transition: visibility 0.3s ease, opacity 0.3s ease !important;
+}
+
+/* CLASSE ATIVA - TORNA VISÍVEL */
+.competencia-header-wrapper.visible {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Rótulo da competência (texto pequeno acima) */
+.competencia-label {
+  display: block !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: var(--cor-primaria) !important;
+  margin-bottom: 8px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.6px !important;
+}
+
+/* Valor da competência (texto grande e destacado) */
+.competencia-value {
+  display: block !important;
+  font-size: 1.4rem !important;
+  font-weight: bold !important;
+  color: var(--cor-texto-escuro) !important;
+  word-break: break-word !important;
+}
+
+/* Ícone do campo competência */
+.competencia-icon {
+  display: inline-block !important;
+  margin-right: 8px !important;
+  color: var(--cor-primaria) !important;
+}
+
+/* =========================================================
+   RESPONSIVIDADE - TABLETS
+   ========================================================= */
+@media (max-width: 768px) {
+  .competencia-header-wrapper {
+    top: 22vh !important;
+    min-width: 280px !important;
+    max-width: 90vw !important;
+    padding: 15px 30px !important;
+  }
+
+  .competencia-label {
+    font-size: 0.85rem !important;
+  }
+
+  .competencia-value {
+    font-size: 1.2rem !important;
+  }
+}
+
+/* =========================================================
+   RESPONSIVIDADE - CELULARES PEQUENOS
+   ========================================================= */
+@media (max-width: 480px) {
+  .competencia-header-wrapper {
+    top: 20vh !important;
+    min-width: 85vw !important;
+    padding: 12px 20px !important;
+  }
+
+  .competencia-label {
+    font-size: 0.8rem !important;
+  }
+
+  .competencia-value {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* =========================================================
+   ANIMAÇÃO DE ENTRADA
+   ========================================================= */
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateX(50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(50%) scale(1);
+  }
+}
+
+.competencia-header-wrapper.visible {
+  animation: popIn 0.4s ease-out !important;
+}
+
+/* =========================================================
+   HOVER EFFECT
+   ========================================================= */
+.competencia-header-wrapper.visible:hover {
+  box-shadow: 0 4px 16px rgba(203, 15, 16, 0.25) !important;
+  transform: translateX(50%) translateY(-2px) !important;
+  transition: all 0.3s ease !important;
+}
+/* ===========================
+   Cards pequenos: Competência / Semana
+   =========================== */
+
+/* container dos 2 cards */
+.status-cards{
+  position: absolute !important;
+  top: 1rem !important;
+  right: 1rem !important;
+  z-index: 60 !important;
+
+  display: flex !important;
+  gap: .75rem !important;
+  align-items: stretch !important;
+}
+
+/* card base (sobrio e menor) */
+.info-card{
+  background: #fff !important;
+  border: 1px solid #dee2e6 !important;
+  border-left: 4px solid var(--cor-primaria) !important;
+  border-radius: .75rem !important;
+
+  padding: .55rem .75rem !important;
+  min-width: 160px !important;
+  max-width: 220px !important;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,.06) !important;
+}
+
+/* label (linha de cima) */
+.info-card__label{
+  display: flex !important;
+  align-items: center !important;
+  gap: .45rem !important;
+
+  font-size: .75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .3px !important;
+  text-transform: uppercase !important;
+  color: var(--cor-texto-claro) !important;
+  margin-bottom: .2rem !important;
+}
+
+/* ícone */
+.info-card__icon{
+  color: var(--cor-primaria) !important;
+}
+
+/* valor (linha de baixo) */
+.info-card__value{
+  display: block !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  color: var(--cor-texto-escuro) !important;
+  line-height: 1.1 !important;
+}
+
+/* Responsivo: empilha no mobile */
+@media (max-width: 480px){
+  .status-cards{
+    left: 1rem !important;
+    right: 1rem !important;
+    top: .75rem !important;
+    justify-content: space-between !important;
+  }
+  .info-card{
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+}
+
+/* Container principal do topo */
+.header-container {
+  position: relative;
+  display: flex;
+  align-items: center;          /* ALINHA VERTICALMENTE */
+  justify-content: center;      /* mantém o título central */
+  padding: 24px 32px;
+  background: #c91010; /* mesmo vermelho do header */
+}
+
+/* Título central */
+.header-title {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Cards à direita */
+.status-cards {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Cards menores e elegantes */
+.info-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 6px 12px;
+  min-width: 150px;
+
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  border-left: 4px solid var(--cor-primaria);
+}
+
+/* Label */
+.info-card__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Valor */
+.info-card__value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #222;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .header-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .status-cards {
+    position: static;
+    transform: none;
+  }
+}
+
+/* HEADER: 3 colunas -> [vazio] [título] [cards] */
+.header-container{
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;            /* centraliza verticalmente */
+  padding: 26px 32px;
+}
+
+/* Título fica no centro real */
+.header-title{
+  grid-column: 2;
+  justify-self: center;
+  margin: 0;
+}
+
+/* Cards ficam na direita e centralizados verticalmente */
+.status-cards{
+  grid-column: 3;
+  justify-self: end;
+  align-self: center;
+
+  position: static !important;    /* MATA o absolute antigo */
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  transform: none !important;
+
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Mobile: empilha */
+@media (max-width: 600px){
+  .header-container{
+    grid-template-columns: 1fr;
+    gap: 12px;
+    justify-items: center;
+  }
+  .header-title{ grid-column: 1; }
+  .status-cards{
+    grid-column: 1;
+    justify-self: center;
+  }
+}
+/* A main-content vira referência */
+.main-content {
+  position: relative;
+}
+
+/* Cards posicionados dentro da área branca */
+.status-cards {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  z-index: 10;
+}
+
+/* Card visual */
+.info-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 8px 14px;
+  min-width: 150px;
+
+  border-left: 4px solid var(--cor-primaria);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* Label */
+.info-card__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Valor */
+.info-card__value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #222;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .status-cards {
+    position: static;
+    margin-bottom: 12px;
+    justify-content: flex-end;
+  }
+}
+
+/* =========================================================
+   STATUS CARDS CENTRALIZADOS
+   ========================================================= */
+
+.status-cards {
+  position: static !important;
+  margin-top: 80px; /* aumenta a distância do elemento acima */
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  transform: none !important;
+  
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;        /* CENTRALIZA OS CARDS */
+  flex-wrap: wrap;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Card individual */
+.info-card {
+  background: #ffffff !important;
+  border: 1px solid #dee2e6 !important;
+  border-left: 4px solid var(--cor-primaria) !important;
+  border-radius: 0.75rem !important;
+  
+  padding: 1.25rem 1.5rem !important;
+  padding: 85px 105px;
+  line-height: 1.2;  /* reduz altura do texto */
+  min-width: 480px !important;
+  max-width: 550px !important;
+  
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06) !important;
+  text-align: center;
+}
+
+/* Label do card */
+.info-card__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem !important;
+  
+  font-size: 0.8rem !important;
+  font-weight: 400 !important;
+  text-transform: uppercase !important;
+  color: var(--cor-texto-claro) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Ícone */
+.info-card__icon {
+  color: var(--cor-primaria) !important;
+}
+
+/* Valor do card */
+.info-card__value {
+  display: block !important;
+  font-size: 1.3rem !important;
+  font-weight: 800 !important;
+  color: var(--cor-texto-escuro) !important;
+}
+
+:root{
+  --ssma-red: #c40000;      /* TROQUE para o vermelho do seu formulário */
+  --ssma-border: #7a7a7a;
+  --ssma-gray: #d9d9d9;
+  --ssma-bg: #ffffff;
+}
+
+/* container (se quiser limitar largura) */
+.table-ssma{
+  max-width: 520px;
+}
+
+/* tabela */
+.ssma-table{
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--ssma-bg);
+  font-size: 13px;
+}
+
+.ssma-table th,
+.ssma-table td{
+  border: 1px solid var(--ssma-border);
+  padding: 6px 8px;
+}
+
+/* título SSMA (linha de cima) */
+.ssma-title{
+  background: var(--ssma-gray);
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: .5px;
+}
+
+/* cabeçalhos Meta/Resultado */
+.ssma-head-left{
+  background: var(--ssma-gray);
+  width: 45%;
+}
+
+.ssma-head{
+  background: var(--ssma-gray);
+  font-weight: 700;
+  text-align: center;
+  width: 27.5%;
+}
+
+/* coluna vermelha (labels) */
+.ssma-label{
+  background: var(--ssma-red);
+  color: #151515;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* inputs editáveis */
+.ssma-input{
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  padding: 2px 0;
+}
+
+/* ao focar, mostra “caixinha” igual edição */
+.ssma-input:focus{
+  background: #fff;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.15);
+  border-radius: 4px;
+}
+
+.ssma-table{
+  border-collapse: collapse;
+  font-size: 13px;
+  background: #fff;
+}
+
+.ssma-table th,
+.ssma-table td{
+  border: 1px solid #7a7a7a;
+  padding: 6px 8px;
+}
+
+/* SSMA (topo) */
+.ssma-title{
+  background: #d9d9d9;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* cabeçalhos */
+.ssma-head-left,
+.ssma-head{
+  background: #bfbfbf;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* 1ª coluna (agora cinza, não vermelho) */
+.ssma-label{
+  background: #bfbfbf;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* inputs */
+.ssma-input{
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  padding: 2px 0;
+}
+
+.ssma-input:focus{
+  background: #fff;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.12);
+  border-radius: 4px;
+}
+
+
+/* container geral dos cards */
+.status-cards {
+  display: grid;
+  grid-template-columns: 220px 160px; /* ajuste fino aqui */
+  gap: 8px;
+  align-items: stretch;
+  margin-top: 4px;
+}
+
+/* card individual */
+.info-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start; /* 👈 garante alinhamento à esquerda */
+  height: 42px;
+  padding: 4px 10px;
+  border: 1px solid #7a7a7a;
+  background: #e6e6e6;
+  box-sizing: border-box;
+}
+/* label */
+.info-card__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #000;
+  line-height: 1.1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-align: left; /* 👈 */
+  width: 100%;
+}
+
+/* valor */
+.info-card__value {
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 2px;
+  text-align: left; /* 👈 */
+  width: 100%;
+}
+
+/* ícone alinhado */
+.info-card__icon {
+  font-size: 13px;
+}
+
+/* faixa inteira (linha do excel) */
+.excel-bar{
+  width: 100%;
+  display: grid;
+  grid-template-columns: 220px 160px 1fr 260px; /* ajuste fino */
+  gap: 0;
+  border: 1px solid #7a7a7a;
+  background: #d9d9d9;
+  height: 34px;        /* altura tipo Excel */
+  box-sizing: border-box;
+}
+
+/* cada "célula" */
+.excel-cell{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* esquerda */
+  gap: 8px;
+  padding: 0 10px;
+  border-right: 1px solid #7a7a7a;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* última célula sem borda direita */
+.excel-cell:last-child{
+  border-right: none;
+}
+
+/* label e valor com cara de planilha */
+.excel-label{
+  font-size: 13px;
+  font-weight: 700;
+  color: #000;
+}
+
+.excel-value{
+  font-size: 13px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* se quiser que o meio (competência) ocupe mais */
+.excel-cell--wide{
+  min-width: 320px;
+}
+
+/* coloca SSMA e Histograma lado a lado */
+.report-row{
+  display: grid;
+  grid-template-columns: 460px 1fr; /* SSMA fixo / Histograma flex */
+  gap: 18px;
+  align-items: start;
+}
+
+/* título da seção tipo excel */
+.excel-section-title{
+  background: #d9d9d9;
+  border: 1px solid #7a7a7a;
+  border-bottom: none;
+  font-weight: 800;
+  padding: 6px 10px;
+  width: 80%;
+  min-width: 220px;
+  margin-bottom: 0;
+}
+
+/* Histograma */
+.hist-table{
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 13px;
+}
+
+.hist-table th,
+.hist-table td{
+  border: 1px solid #7a7a7a;
+  padding: 6px 8px;
+  text-align: center;
+}
+
+/* canto superior esquerdo (vazio) */
+.hist-corner{
+  background: #bfbfbf;
+  width: 140px;
+  border-color: #7a7a7a;
+}
+
+/* cabeçalho colunas */
+.hist-head{
+  background: #bfbfbf;
+  font-weight: 800;
+  border-color: #7a7a7a;
+  white-space: nowrap;
+}
+
+/* cabeçalho linhas (Previsto/Real/Desvio) */
+.hist-rowhead{
+  background: #bfbfbf;
+  font-weight: 800;
+  text-align: left;
+  padding-left: 10px;
+  border-color: #7a7a7a;
+}
+
+/* linha azul do desvio */
+.hist-blue{
+  background: #dbeafe;
+}
+
+.hist-rowhead--blue{
+  background: #bfbfbf; /* no print fica cinza, só os valores ficam azul */
+}
+
+/* inputs editáveis */
+.hist-input{
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  padding: 2px 0;
+}
+
+.hist-input:focus{
+  background: #fff;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.12);
+  border-radius: 4px;
+}
+
+/* GRID principal: esquerda SSMA / direita Histograma */
+.report-grid{
+  display: grid;
+  grid-template-columns: 460px 1fr; /* SSMA fixo + direita flex */
+  gap: 18px;
+  align-items: start;
+}
+
+/* empilha blocos dentro de cada coluna */
+.left-col, .right-col{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* títulos tipo excel */
+.excel-title-big{
+  background: #d9d9d9;
+  border: 1px solid #7a7a7a !important;
+  text-align: center;
+  font-weight: 800;
+  padding: 6px 10px;
+}
+
+.excel-title-sub{
+  background: #6f6f6f;
+  color: #fff;
+  border: 1px solid #7a7a7a;
+  border-top: none;
+  text-align: center;
+  font-weight: 800;
+  padding: 6px 10px;
+}
+
+/* input padrão excel reutilizável */
+.excel-input{
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  padding: 2px 0;
+}
+
+.excel-input:focus{
+  background: #fff;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.12);
+  border-radius: 4px;
+}
+
+/* ===== TABELA ACOMPANHAMENTO FÍSICO ===== */
+.fisico-table{
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 13px;
+}
+
+.fisico-table th,
+.fisico-table td{
+  border: 1px solid #7a7a7a;
+  padding: 6px 8px;
+}
+
+.fisico-corner{
+  background: #bfbfbf;
+  width: 140px;
+}
+
+.fisico-head{
+  background: #bfbfbf;
+  font-weight: 800;
+  text-align: center;
+}
+
+.fisico-rowhead{
+  background: #bfbfbf;
+  font-weight: 800;
+  text-align: left;
+  padding-left: 10px;
+  white-space: nowrap;
+}
+
+.row-blue{
+  background: #dbeafe;
+}
+
+.excel-green{
+  color: #0a7a2f;
+  font-weight: 900;
+}
+
+/* ===== TABELA HH (ABAIXO DO HISTOGRAMA) ===== */
+.hh-table{
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 13px;
+}
+
+.hh-table td{
+  border: 1px solid #7a7a7a;
+  padding: 6px 8px;
+  vertical-align: middle;
+}
+
+.hh-label{
+  background: #bfbfbf;
+  font-weight: 800;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.hh-value{
+  background: #fff;
+  min-width: 90px;
+}
+
+.hh-blue{
+  background: #dbeafe;
+}
+/* bloco final */
+.curve-block{
+  margin-top: 18px; /* fica depois de todas as outras */
+}
+
+/* título azul escuro como no print */
+.curve-title{
+  background: #d9d9d9;
+  font-weight: 800;
+  text-align: center;
+  padding: 10px 12px;
+  border: 1px solid #7a7a7a;
+  border-bottom: none;
+}
+
+/* tabela */
+.curve-table{
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 13px;
+  border: 1px solid #7a7a7a;
+}
+
+.curve-table th,
+.curve-table td{
+  border: 1px solid #7a7a7a;
+  padding: 6px 8px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* cabeçalho principal */
+.curve-head{
+  background: #ffffff;
+  font-weight: 800;
+}
+
+/* grupos "Acumulado" / "Semanal" */
+.curve-group{
+  background: #ffffff;
+  font-weight: 800;
+}
+
+/* subcabeçalhos */
+.curve-subhead{
+  background: #ffffff;
+  font-weight: 800;
+}
+
+/* primeira coluna (Período) com “cara de planilha” */
+.curve-rowhead{
+  text-align: left;
+  font-weight: 800;
+  padding-left: 10px;
+  background: #ffffff;
+}
+
+/* inputs */
+.curve-input{
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  padding: 2px 0;
+}
+
+.curve-input:focus{
+  background: #fff;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.12);
+  border-radius: 4px;
+}
+
+/* inputs */
+.curve-input-ano{
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  padding: 2px 0;
+}
+
+.curve-input-ano:focus{
+  background: #fff;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.12);
+  border-radius: 4px;
+}
+
+.cell-error {
+  outline: 2px solid #d9534f;
+  background: rgba(217, 83, 79, 0.08);
+}
+
+
+
+/* Cabeçalho: primeira coluna (se houver th na 1ª coluna) */
+#ssma-table thead tr th:first-child {
+  color: #040404; /* cor desejada */
+}
+
+/* Corpo: primeira coluna (todas as linhas) */
+#ssma-table tbody tr td:first-child {
+  color: #040404; /* cor desejada */
+}
+
+/* Se suas células da primeira coluna têm a classe ssma-label */
+#ssma-table tbody td.ssma-label {
+  color: #040404; /* cor desejada */
+  font-weight: bold;
+}
+
+/* Inputs (caso algum dia haja input nessa coluna; hoje não tem) */
+#ssma-table tbody tr td:first-child input,
+#ssma-table tbody td.ssma-label input {
+  color: #040404;
+}
+
+/* Cabeçalho: primeira coluna (se houver th na 1ª coluna) */
+#ssma-table thead tr th:first-child {
+  color: #040404; /* cor desejada */
+}
+
+/* Corpo: primeira coluna (todas as linhas) */
+#ssma-table tbody tr td:first-child {
+  color: #040404; /* cor desejada */
+}
+
+/* Se suas células da primeira coluna têm a classe meta-label */
+#ssma-table tbody td.meta-label {
+  color: #040404; /* cor desejada */
+}
+
+/* Inputs (caso algum dia haja input nessa coluna; hoje não tem) */
+#ssma-table tbody tr td:first-child input,
+#ssma-table tbody td.meta-label input {
+  color: #040404;
+}
+
+
+/* Cabeçalho: Meta (2ª coluna) e Resultado (3ª) */
+#ssma-table thead tr:nth-child(2) th:nth-child(2),
+#ssma-table thead tr:nth-child(2) th:nth-child(3) {
+  color:#040404; /* azul */
+}
+
+/* Corpo: Meta */
+#ssma-table tbody td:nth-child(2),
+#ssma-table tbody td:nth-child(2) input.ssma-input {
+  color: #040404; /* azul */
+}
+
+/* Corpo: Resultado */
+#ssma-table tbody td:nth-child(3),
+#ssma-table tbody td:nth-child(3) input.ssma-input {
+  color:#040404; /* verde */
+}
+
+/* Linha específica (ex.: destacar IFS) */
+#ssma-table tbody tr:has(> td.ssma-label:nth-child(1):is(:contains("IFS"))) td {
+  color: #040404; /* roxo */
+}
+
+
+
+/* ===== HISTOGRAMA: todas as fontes pretas ===== */
+
+/* Cabeçalho */
+#hist-table thead th {
+  color: #000;
+}
+
+/* Corpo: todas as células */
+#hist-table tbody td {
+  color: #000;
+}
+
+/* Inputs de valor */
+#hist-table tbody td input.hist-input {
+  color: #000;
+}
+
+/* Células com classes específicas (garante preto mesmo se tiver cor aplicada por outra regra) */
+#hist-table .hist-rowhead,
+#hist-table .hist-rowhead--blue,
+#hist-table .hist-blue {
+  color: #000 !important;
+}
+
+/* Caso existam spans/textos internos com cores herdadas */
+#hist-table thead th *,
+#hist-table tbody td * {
+  color: #000 !important;
+}
+
+/* Opcional: se existir algum estado de erro que mude a cor, força preto */
+#hist-table .cell-error,
+#hist-table .cell-error * {
+  color: #000 !important;
+}
+
+/* ===== HISTOGRAMA: todas as fontes em preto ===== */
+
+/* Cabeçalho de seção (o título grande "HISTOGRAMA") */
+#block-histograma .excel-section-title {
+  color: #000 !important;
+}
+
+/* Cabeçalho da tabela */
+#hist-table thead th {
+  color: #000 !important;
+}
+
+/* Corpo da tabela: todas as células */
+#hist-table tbody td {
+  color: #000 !important;
+}
+
+/* Inputs dentro das células */
+#hist-table tbody td input.hist-input {
+  color: #000 !important;
+}
+
+/* Classes específicas que podem ter estilos próprios */
+#hist-table .hist-rowhead,
+#hist-table .hist-rowhead--blue,
+#hist-table .hist-blue {
+  color: #000 !important;
+}
+
+/* Caso haja elementos internos com cor aplicada por outras regras */
+#hist-table thead th *,
+#hist-table tbody td * {
+  color: #000 !important;
+}
+
+/* (Opcional) manter texto preto mesmo em estado de erro */
+#hist-table .cell-error,
+#hist-table .cell-error * {
+  color: #000 !important;
+}
+
+
+/* ===== HH: todas as fontes pretas ===== */
+
+/* Cabeçalho (se houver th futuramente) */
+#hh-table thead th {
+  color: #000 !important;
+}
+
+/* Todas as células do corpo */
+#hh-table tbody td {
+  color: #000 !important;
+}
+
+/* Inputs dentro das células */
+#hh-table tbody td input.excel-input {
+  color: #000 !important;
+}
+
+
+.hist-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;   /* força respeitar as larguras */
+  font-size: 13px;
+}
+
+.hist-table th,
+.hist-table td {
+  padding: 6px 10px;
+  border: 1px solid #7a7a7a;
+}
+
+.hist-rowhead {
+  background: #bfbfbf;
+  font-weight: 800;
+  text-align: left;
+  padding-left: 10px;
+  border-color: #7a7a7a;
+}
+
+/* Evitar que o conteúdo “estoure” a coluna */
+.hist-table th, .hist-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;   /* se quiser truncar em uma linha */
+  /* white-space: normal;  se preferir quebrar linha */
+  word-break: break-word; /* útil quando tem palavras longas */
+}
+
+
+/* Mantém seu CSS atual */
+.hist-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;   /* força respeitar as larguras */
+  font-size: 13px;
+}
+
+.hist-table th,
+.hist-table td {
+  padding: 6px 10px;
+  border: 1px solid #7a7a7a;
+}
+
+/* Cabeçalho */
+.hist-rowhead {
+  background: #bfbfbf;
+  font-weight: 800;
+  text-align: left;
+  padding-left: 10px;
+  border-color: #7a7a7a;
+}
+
+/* Evitar “estouro” */
+.hist-table th, .hist-table td {
+  overflow: hidden;
+  padding: 1px 1px !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;   /* truncar em uma linha */
+  /* white-space: normal;  se quiser quebrar linha */
+  word-break: break-word;
+}
+
+/* >>> Larguras por coluna (exemplo com 5 colunas) <<< */
+.hist-table th:nth-child(1),
+.hist-table td:nth-child(1) { width: 12% !important; }  /* coluna 1 menor */
+
+.hist-table th:nth-child(2),
+.hist-table td:nth-child(2) { width: 15% !important; }
+
+.hist-table th:nth-child(3),
+.hist-table td:nth-child(3) { width: 15% !important; }
+
+.hist-table th:nth-child(4),
+.hist-table td:nth-child(4) { width: 15% !important; }
+
+.hist-table th:nth-child(5),
+.hist-table td:nth-child(5) { width: 15% !important; }  /* ajusta para fechar 100% */
+
+
+
+
+/* ===== CURVA DE AVANÇO FÍSICO: todas as fontes pretas ===== */
+
+/* Título da seção (texto "Curva de Avanço Físico") */
+#curve-block .curve-title {
+  color: #000 !important;
+}
+
+/* Cabeçalhos da tabela */
+#curve-table thead th,
+#curve-table thead th.curve-head,
+#curve-table thead th.curve-group,
+#curve-table thead th.curve-subhead {
+  color: #000 !important;
+}
+
+/* Corpo: todas as células */
+#curve-table tbody td {
+  color: #000 !important;
+}
+
+/* Inputs dentro das células */
+#curve-table tbody td input.curve-input {
+  color: #000 !important;
+}
+
+/* Linha de rótulo (coluna "Período" que vira texto 'Sem-20', etc.) */
+#curve-table tbody td.curve-rowhead {
+  color: #000 !important;
+}
+
+/* Caso existam elementos internos com cor aplicada por outras regras */
+#curve-table thead th *,
+#curve-table tbody td * {
+  color: #000 !important;
+}
+
+/* (Opcional) manter texto preto mesmo quando a célula estiver com estado de erro */
+#curve-table .cell-error,
+#curve-table .cell-error * {
+  color: #000 !important;
+}
+
+.curve-table th:nth-child(1),
+.curve-table td:nth-child(1) { width: 6% !important; }  /* coluna 1 menor */
+
+.curve-table th:nth-child(2),
+.curve-table td:nth-child(2) { width: 15% !important; } 
+.curve-table th:nth-child(3),
+.curve-table td:nth-child(3) { width: 15% !important; }
+
+.curve-table th:nth-child(4),
+.curve-table td:nth-child(4) { width: 15% !important; }
+
+.curve-table th:nth-child(5),
+.curve-table td:nth-child(5) { width: 15% !important; }  /* ajusta para fechar 100% */
+
+.curve-table th:nth-child(5),
+.curve-table td:nth-child(5) { width: 15% !important; }  /* ajusta para fechar 100% */
+
+.curve-table th:nth-child(6),
+.curve-table td:nth-child(6) { width: 15% !important; }  /* ajusta para fechar 100% */
+
+/* ===== ACOMPANHAMENTO FÍSICO: todas as fontes pretas ===== */
+
+/* Títulos da seção */
+#block-acompanhamento .excel-title-big,
+#block-acompanhamento .excel-title-sub {
+  color: #000 !important;
+}
+
+/* Cabeçalhos da tabela */
+#fisico-table thead th,
+#fisico-table thead th.fisico-head,
+#fisico-table thead th.fisico-corner {
+  color: #000 !important;
+}
+
+/* Corpo: todas as células */
+#fisico-table tbody td {
+  color: #000 !important;
+}
+
+/* Inputs dentro das células */
+#fisico-table tbody td input.excel-input {
+  color: #000 !important;
+}
+
+/* Classes específicas (garante preto mesmo se houver regras anteriores) */
+#fisico-table .fisico-rowhead,
+#fisico-table .row-blue {
+  color: #000 !important;
+  font-weight: bold;
+}
+
+/* Caso haja elementos internos com cor herdada */
+#fisico-table thead th *,
+#fisico-table tbody td * {
+  color: #000 !important;
+}
+
+/* (Opcional) manter texto preto mesmo quando a célula estiver com estado de erro */
+#fisico-table .cell-error,
+#fisico-table .cell-error * {
+  color: #000 !important;
+}
+
+ /* Estrutura geral da tabela (opcional para visual) */
+  .ssma-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* ajuda a manter alinhamento consistente */
+  }
+
+  .ssma-table th,
+  .ssma-table td {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+  }
+
+  /* Título e cabeçalho centralizados */
+  .ssma-title,
+  .ssma-head-left {
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .ssma-head{
+    text-align: center;
+    border: 1px solid #7a7a7a !important;
+    font-weight: 600;
+  }
+
+  /* Labels (primeira coluna) centralizados */
+  .ssma-label {
+    text-align: center;
+    font-weight: 500;
+  }
+
+  /* Inputs: base visual */
+  .ssma-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    padding: 4px 6px;
+  }
+
+  /* Textos centralizados (não numéricos) */
+  .ssma-input.text-center {
+    text-align: center;
+  }
+
+  /* Valores numéricos/percentuais à direita */
+  .ssma-input.numeric-right {
+    text-align: right;
+  }
+
+  /* Opcional: evitar que “#VALOR!” quebre visual */
+  .ssma-input.error-text {
+    color: #c00;
+    font-weight: 300 !important;
+    text-align: center; /* mantém erro centralizado */
+  }
+
+  /* Estrutura geral */
+  .ssma-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .ssma-table th,
+  .ssma-table td {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+  }
+
+  /* Cabeçalhos centralizados */
+  .ssma-head,
+  .ssma-head-left,
+  .ssma-title {
+    font-weight: 600;
+  }
+
+  /* Primeira coluna (labels) centralizada */
+  .ssma-label {
+    text-align: center !important;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Inputs: base visual */
+  .ssma-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    padding: 4px 6px;
+  }
+
+  /* Textos centralizados (não numéricos) */
+  .ssma-input.text-center {
+    text-align: center !important;
+  }
+
+  /* Valores numéricos/percentuais à direita */
+  .ssma-input.numeric-right {
+    text-align: right !important;
+  }
+
+  /* Erros como #VALOR! centralizados e evidentes */
+  .ssma-input.error-text {
+    color: #c00;
+    font-weight: 600;
+    text-align: center !important;
+  }
+
+
+/* Estrutura geral */
+  .fisico-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .fisico-table th,
+  .fisico-table td {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+  }
+
+  /* Cabeçalhos centralizados */
+  .fisico-head,
+  .fisico-corner {
+    text-align: center !important;
+    font-weight: 600;
+  }
+
+  /* Primeira coluna (labels) centralizada */
+  .fisico-rowhead {
+    text-align: center !important;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Inputs: base visual */
+  .excel-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    padding: 4px 6px;
+  }
+
+  /* Textos centralizados (não numéricos) */
+  .excel-input.text-center {
+    text-align: center !important;
+  }
+
+  /* Valores numéricos/percentuais/datas à direita */
+  .excel-input.numeric-right {
+    text-align: right !important;
+  }
+
+  /* Erros como #VALOR! centralizados e evidentes (se aparecerem) */
+  .excel-input.error-text {
+    color: #c00;
+    font-weight: 600;
+    text-align: center !important;
+  }
+
+
+  /* Estrutura geral */
+  .hist-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .hist-table th,
+  .hist-table td {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+  }
+
+  /* Cabeçalhos centralizados */
+  .hist-head,
+  .hist-corner {
+    text-align: center !important;
+    font-weight: 600;
+  }
+
+  /* Primeira coluna (labels) centralizada */
+  .hist-rowhead {
+    text-align: center !important;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+ 
+.hist-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  padding: 4px 6px;
+
+  font-size: 14px !important; /* DIMINUI aqui */
+}
+
+
+  /* Textos centralizados (não numéricos) */
+  .hist-input.text-center {
+    text-align: center !important;
+  }
+
+  /* Valores numéricos à direita */
+  .hist-input.numeric-right {
+    text-align: right !important;
+  }
+
+  /* Erros como #VALOR! centralizados e evidentes (se aparecerem) */
+  .hist-input.error-text {
+    color: #c00;
+    font-weight: 600;
+    text-align: center !important;
+  }
+
+  
+
+  /* Estrutura geral */
+  .hh-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .hh-table td {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+  }
+
+  /* Labels centralizados */
+  .hh-label {
+    text-align: center !important;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Células de valor (se quiser aplicar algo visual) */
+  .hh-value {
+    /* nenhum alinhamento aqui; o alvo é o input dentro */
+  }
+
+  /* Inputs: base visual */
+  .excel-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    padding: 4px 6px;
+  }
+
+  /* Textos centralizados (não numéricos) */
+  .excel-input.text-center {
+    text-align: center !important;
+  }
+
+  /* Valores numéricos à direita */
+  .excel-input.numeric-right {
+    text-align: right !important;
+  }
+
+  /* Erros como #VALOR! centralizados e evidentes */
+  .excel-input.error-text {
+    color: #c00;
+    font-weight: 600;
+    text-align: center !important;
+  }
+
+  
+
+  .hh-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .hh-table td { padding: 8px 10px; border: 1px solid #ddd; }
+
+  .hh-label { text-align: center !important; font-weight: 500; white-space: nowrap; }
+
+  .excel-input {
+    width: 100%; box-sizing: border-box; border: none; outline: none;
+    background: transparent; font: inherit; padding: 4px 6px;
+  }
+  .excel-input.text-center { text-align: center !important; }
+  .excel-input.numeric-right { text-align: right !important; }
+  .excel-input.error-text { color: #c00; font-weight: 600; text-align: center !important; }
+
+  
+
+  .curve-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .curve-table th, .curve-table td { padding: 8px 10px; border: 1px solid #ddd; }
+
+  /* Cabeçalhos e grupos centralizados */
+  .curve-head, .curve-group, .curve-subhead {
+    text-align: center !important;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Primeira coluna (Período) centralizada */
+  .curve-rowhead {
+    text-align: center !important;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Inputs: base visual */
+  .curve-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    padding: 4px 6px;
+  }
+
+  /* Classificações de alinhamento */
+  .curve-input.text-center { text-align: center !important; }
+  .curve-input.numeric-right { text-align: right !important; }
+
+  /* Erros como #VALOR! */
+  .curve-input.error-text {
+    color: #c00;
+    font-weight: 600;
+    text-align: center !important;
+  }
+
+/* 1) SSMA define o "padrão" */
+:root{
+  --ssma-col-1: 140px;  /* coluna de label (esquerda) */
+  --ssma-col-n: 140px;  /* colunas numéricas (Meta/Resultado) */
+}
+
+/* 2) Layout fixo (colunas não “dançam”) */
+#ssma-table,
+#fisico-table,
+#hist-table,
+#hh-table,
+#curve-table{
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* 3) SSMA (3 colunas) */
+#ssma-table th:nth-child(1),
+#ssma-table td:nth-child(1){ width: var(--ssma-col-1); }
+
+#ssma-table th:nth-child(2),
+#ssma-table td:nth-child(2),
+#ssma-table th:nth-child(3),
+#ssma-table td:nth-child(3){ width: var(--ssma-col-n); }
+
+/* 4) Físico (4 colunas: label + 3 numéricas) */
+#fisico-table th:nth-child(1),
+#fisico-table td:nth-child(1){ width: var(--ssma-col-1); }
+
+#fisico-table th:nth-child(2),
+#fisico-table td:nth-child(2),
+#fisico-table th:nth-child(3),
+#fisico-table td:nth-child(3),
+#fisico-table th:nth-child(4),
+#fisico-table td:nth-child(4){ width: var(--ssma-col-n); }
+
+/* 5) Histograma (5 colunas: label + 4 numéricas) */
+#hist-table th:nth-child(1),
+#hist-table td:nth-child(1){ width: var(--ssma-col-1); }
+
+#hist-table th:nth-child(2),
+#hist-table td:nth-child(2),
+#hist-table th:nth-child(3),
+#hist-table td:nth-child(3),
+#hist-table th:nth-child(4),
+#hist-table td:nth-child(4),
+#hist-table th:nth-child(5),
+#hist-table td:nth-child(5){ width: var(--ssma-col-n); }
+
+/* 6) Curva (9 colunas: 1 label + 8 numéricas/texto) */
+#curve-table th:nth-child(1),
+#curve-table td:nth-child(1){ width: var(--ssma-col-1); }
+
+#curve-table th:nth-child(n+2),
+#curve-table td:nth-child(n+2){ width: var(--ssma-col-n); }
+
+/* 7) HH (tabela “quebrada” em pares label/valor) 
+   - deixa cada "valor" com a mesma largura numérica da SSMA
+   - labels ocupam o espaço restante sem estourar
+*/
+#hh-table td.hh-value { width: var(--ssma-col-n); }
+#hh-table td.hh-label { width: calc((100% - (3 * var(--ssma-col-n))) / 3); }
+
+/* (Opcional) garante que inputs não forcem largura */
+#ssma-table input,
+#fisico-table input,
+#hist-table input,
+#hh-table input,
+#curve-table input{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ===========================
+   HISTOGRAMA – LAYOUT COMPACTO
+=========================== */
+
+#hist-table {
+  width: 80%;
+  table-layout: fixed; /* ESSENCIAL */
+  border-collapse: collapse;
+}
+
+/* Coluna da esquerda (labels: Previsto / Real / Desvio) */
+#hist-table th:first-child,
+#hist-table td:first-child {
+  width: 160px;          /* ajuste aqui */
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Demais colunas numéricas */
+#hist-table th:not(:first-child),
+#hist-table td:not(:first-child) {
+  width: 110px;          /* largura menor */
+  text-align: center;
+}
+
+/* Inputs não podem estourar a célula */
+#hist-table input.hist-input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  padding: 4px 6px;
+  font-size: 0.9rem;
+}
+
+/* Reduz altura geral */
+#hist-table th,
+#hist-table td {
+  padding: 6px 6px;
+}
+
+/* Mantém visual limpo */
+#hist-table th {
+  white-space: nowrap;
+}
+
+/* Evita que texto grande force largura */
+#hist-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===========================
+   HH – LAYOUT COMPACTO
+=========================== */
+
+#hh-table {
+  width: 80%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+/* Labels (texto à esquerda) */
+#hh-table td.hh-label {
+  width: 220px; /* ajuste fino aqui */
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Valores (inputs numéricos) */
+#hh-table td.hh-value {
+  width: 110px; /* mesmo padrão do histograma */
+  text-align: center;
+}
+
+/* Inputs */
+#hh-table input.excel-input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  padding: 4px 6px;
+  font-size: 0.9rem;
+}
+
+/* Altura compacta */
+#hh-table td {
+  padding: 6px 6px;
+}
+
+/* Evita quebra visual */
+#hh-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ====== Container mais compacto ====== */
+#selection-menu.initial-setup.compact {
+  /* largura e espaçamento menores */
+  max-width: 520px;          /* ajuste conforme a UI desejada */
+  padding: 12px 14px;
+  margin: 0 auto;            /* centraliza se necessário */
+}
+
+/* Reduz o espaçamento vertical típico do Bootstrap/Fluig */
+#selection-menu.initial-setup.compact .form-group {
+  margin-bottom: 10px;       /* padrão costuma ser 15px */
+}
+
+/* ====== Label menor e alinhado ====== */
+#selection-menu.initial-setup.compact .form-label {
+  display: inline-block;
+  font-size: 13px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  color: #4a4a4a;
+}
+
+/* ====== Campo (input zoom) compacto ====== */
+/* Fluig herda de .form-control (Bootstrap 3). Vamos reduzir altura via font e padding. */
+#selection-menu.initial-setup.compact .form-control[type="zoom"],
+#selection-menu.initial-setup.compact input.form-control[type="zoom"] {
+  font-size: 13px;
+  line-height: 1.3;
+  height: auto;              /* evita altura fixa do tema */
+  padding: 6px 8px;          /* menor que o padrão (~10px) */
+  min-height: 30px;          /* garante área clicável confortável */
+}
+
+/* Se o componente de zoom montar wrappers adicionais, controle eles também */
+#selection-menu.initial-setup.compact .zoom-component,
+#selection-menu.initial-setup.compact .zoom-container,
+#selection-menu.initial-setup.compact .zoom-field {
+  /* alguns temas do Fluig criam estruturas ao redor do input */
+  font-size: 13px;
+}
+
+/* ====== Botão “Iniciar” compacto ====== */
+/* Fluig possui classes como .btn, .btn-primary, .btn-add, .btn2. Vamos padronizar o tamanho. */
+#start-button.btn2.btn-add {
+  --btn-radius: 6px;
+
+  font-size: 13px;
+  line-height: 1.2;
+  padding: 6px 10px;         /* reduz altura/largura */
+  border-radius: var(--btn-radius);
+  min-height: 28px;
+
+  /* Se o tema coloca ícones/margens exageradas */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Espaçamento entre campo e botão dentro da mesma .form-group */
+#selection-menu.initial-setup.compact .form-group > .form-control[type="zoom"] + #start-button {
+  margin-left: 8px;          /* pequeno espaço lateral */
+}
+
+/* ====== Ajuste fino de layout inline (opcional) ====== */
+/* Se você quiser o campo e o botão na mesma linha de maneira estável */
+#selection-menu.initial-setup.compact .form-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+#selection-menu.initial-setup.compact .form-label {
+  flex: 0 0 100%;            /* label ocupa a linha inteira acima */
+}
+#selection-menu.initial-setup.compact .form-control[type="zoom"] {
+  flex: 1 1 280px;           /* campo cresce até caber */
+}
+#selection-menu.initial-setup.compact #start-button {
+  flex: 0 0 auto;
+}
+
+/* ====== Micro-ajustes visuais (opcional) ====== */
+#selection-menu.initial-setup.compact .form-control[type="zoom"]:focus {
+  border-color: #2a7ae4;
+  box-shadow: 0 0 0 2px rgba(42, 122, 228, .15);
+}
+
+
+
+/* Escopo: apenas dentro do container de seleção */
+#selection-menu.initial-setup.compact #start-button.btn2.btn-add {
+  /* Tamanho mais enxuto */
+  font-size: 12px;           /* menor tipografia */
+  font-weight: 600;          /* melhora legibilidade em tamanhos menores */
+  padding: 6px 10px;         /* reduz altura/largura via padding */
+  min-height: 28px;          /* altura confortável sem exagero */
+  border-radius: 6px;
+
+  /* Centralização absoluta do texto */
+  display: inline-flex;      /* flex para alinhar conteúdo interno */
+  align-items: center;       /* alinha verticalmente */
+  justify-content: center;   /* centraliza horizontalmente */
+  line-height: 1;            /* evita que a linha “estoure” a altura */
+  vertical-align: middle;    /* alinha com elementos vizinhos */
+
+  /* Gaps caso exista ícone dentro do botão */
+  gap: 6px;
+
+  /* Se o tema aplicar sombras/margens grandes, suavize: */
+  /* box-shadow: none; */
+  /* margin-top: 0; margin-bottom: 0; */
+}
+
+/* Se o tema do Fluig/Bootstrap estiver impondo altura via .btn2/.btn-add */
+#selection-menu.initial-setup.compact .btn2.btn-add {
+  height: auto;              /* garante que a altura venha do padding/min-height */
+}
+
+/* Se houver ícone interno (i.fa, span.icon), normalize o tamanho e alinhamento */
+#selection-menu.initial-setup.compact #start-button i,
+#selection-menu.initial-setup.compact #start-button .icon {
+  font-size: 14px;           /* ligeiramente maior que o texto */
+  line-height: 1;            /* evita deslocamento vertical */
+  display: inline-block;
+}
+
+/* Ajuste fino quando estiver na mesma linha do input */
+#selection-menu.initial-setup.compact .form-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+#selection-menu.initial-setup.compact .form-label {
+  flex: 0 0 100%;
+}
+#selection-menu.initial-setup.compact .form-control[type="zoom"] {
+  flex: 1 1 280px;
+}
+#selection-menu.initial-setup.compact #start-button {
+  flex: 0 0 auto;
+}
+
+#selection-menu.initial-setup.compact #start-button.btn2.btn-add {
+  font-size: 11px;
+  padding: 5px 8px;
+  min-height: 26px;
+  border-radius: 5px;
+}
+
+
+/* Botão Iniciar — proporções menores (altura/largura/raio) */
+#selection-menu.initial-setup.compact #start-button.btn2.btn-add {
+  /* NÃO alteramos o font-size do rótulo */
+  /* font-size: inherit; */
+
+  /* Reduz a altura via padding e min-height (sem height fixa) */
+  padding: 2px 5px;          /* altura mais baixa e largura controlada */
+  min-height: 16px;           /* suficiente para área clicável confortável */
+  border-radius: 4px;         /* raio menor para parecer mais compacto */
+
+  /* Layout consistente para centralizar conteúdo (sem mudar o rótulo) */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;             /* não mexe na tipografia, só evita "estouro" vertical */
+  gap: 6px;                   /* espaço caso tenha ícone + texto */
+
+  /* Se quiser limitar largura máxima do botão */
+  max-width: 80px;           /* opcional: limita expansão */
+  /* width: auto;              /* mantém largura natural do conteúdo */
+}
+
+/* Se o tema impõe altura via .btn2/.btn-add, garante que a altura venha do padding/min-height */
+#selection-menu.initial-setup.compact .btn2.btn-add {
+  height: auto;
+}
+
+/* Se existir ícone interno, reduza a dimensão dele sem afetar o texto */
+#selection-menu.initial-setup.compact #start-button i,
+#selection-menu.initial-setup.compact #start-button .icon,
+#selection-menu.initial-setup.compact #start-button .fluigicon {
+  font-size: 14px;            /* ícone proporcional, menor que o padrão */
+  line-height: 1;
+  width: 16px; height: 16px;  /* se for SVG/PNG, dá uma base */
+}
+
+
+/* ========= Containers scrolláveis (compactos) ========= */
+.scrollable-table-container,
+.scrollable-table-container2 {
+  /* reduz o respiro interno do container */
+  padding: 8px 12px;                 /* antes podia estar 16px+ */
+  /* se houver gap interno via flex/grid, pode reduzir também */
+  gap: 8px;
+}
+
+/* Tabela interna — manter estilo/centralização, só reduzir densidade */
+.scrollable-table-container .contract-table,
+.scrollable-table-container2 .contract-table {
+  background-color: #fff;            /* já estava no seu código */
+  font-size: 13px;                   /* opcional: 12–13px para ficar mais compacta */
+  line-height: 1.3;                  /* menor altura de linha */
+  border-spacing: 0;                 /* se estiver usando table com spacing */
+}
+
+/* Cabeçalho da tabela compacto */
+.scrollable-table-container .contract-table thead th,
+.scrollable-table-container2 .contract-table thead th {
+  padding: 4px 6px;                  /* reduzir altura e largura no TH */
+  white-space: nowrap;               /* evitar quebra (se quiser compactação lateral) */
+}
+
+/* Células do corpo compactas */
+.scrollable-table-container .contract-table tbody td,
+.scrollable-table-container2 .contract-table tbody td {
+  padding: 6px 8px;                  /* reduzir altura das linhas */
+  /* manter centralização: não alteramos text-align */
+}
+
+/* Hover (mantém seu estilo existente) */
+.scrollable-table-container .contract-table tbody tr:hover,
+.scrollable-table-container2 .contract-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* ========= Tabela “frozen” (compacta) ========= */
+.frozen-table-container .contract-table {
+  font-size: 13px;                   /* opcional, compacta tipografia */
+  line-height: 1.3;
+}
+
+.frozen-table-container .contract-table th,
+.frozen-table-container .contract-table td {
+  background-color: var(--cor-cinza-coluna-congelada);
+  padding: 6px 8px;                  /* reduzir densidade do bloco congelado */
+}
+
+/* Hover das linhas congeladas (mantém seu estilo) */
+.frozen-table-container .contract-table tbody tr:hover td {
+  background-color: var(--cor-cinza-coluna-congelada-hover);
+}
+
+/* ========= Altura mínima por linha, sem travar height ========= */
+/* Isso ajuda a manter clique confortável sem exagero */
+.scrollable-table-container .contract-table tbody tr,
+.scrollable-table-container2 .contract-table tbody tr,
+.frozen-table-container .contract-table tbody tr {
+  min-height: 30px;                  /* ajuste fino: 28–32px conforme necessidade */
+}
+
+
+/* No próprio item (main-app-container) */
+#main-app-container.container2 {
+  flex: 0 0 1000px;  /* base fixa de 800px; não cresce nem encolhe além disso */
+  max-width: 1000px !important; /* segurança adicional */
+  width: 100%;      /* para respeitar 800px como teto com margin auto */
+  margin: 0 auto;
+}
+
+/* ============================================
+   ESTILOS: CONTROLES DA TABELA HANDSONTABLE
+   ============================================ */
+
+.curve-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.curve-controls button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.curve-controls button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.curve-controls button:active {
+    transform: translateY(0);
+}
+
+.btn-add-row {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-add-row:hover {
+    background-color: #218838;
+}
+
+.btn-remove-row {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-remove-row:hover {
+    background-color: #c82333;
+}
+
+.btn-validate {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-validate:hover {
+    background-color: #0056b3;
+}
+
+.btn-export {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-export:hover {
+    background-color: #5a6268;
+}
+
+.curve-info {
+    margin-left: auto;
+    font-size: 13px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Alert de validação */
+.validation-alert {
+    padding: 12px 16px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: none;
+}
+
+.validation-alert.success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.validation-alert.error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.validation-alert.show {
+    display: block;
+}
+
+/* Células com erro no Handsontable */
+.htCore td.cell-error {
+    background-color: #ffebee !important;
+    border: 1px solid #ef5350 !important;
+}

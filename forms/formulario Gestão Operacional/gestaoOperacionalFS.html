@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link type="text/css" rel="stylesheet" href="/portal/resources/style-guide/css/fluig-style-guide.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <script type="text/javascript" src="/portal/resources/js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/portal/resources/js/jquery/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/portal/resources/js/mustache/mustache-min.js"></script>
+    <script type="text/javascript" src="/portal/resources/style-guide/js/fluig-style-guide.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/webdesk/vcXMLRPC.js"></script>
+    <link rel="stylesheet" type="text/css" href="/style-guide/css/fluig-style-guide-filter.min.css">
+    <script src="/style-guide/js/fluig-style-guide-filter.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="style/style_modelo.css"> 
+</head>
+<body>
+    
+   
+    <form name="form" role="form">
+        <input id="ATIVIDADE" name="ATIVIDADE" type="hidden"> 
+        <input id="NUMPROCESSO" name="NUMPROCESSO" type="hidden">
+        <input id="SOLICITANTE" name="SOLICITANTE" type="hidden">
+        <input id="IMPORTACAO" name="IMPORTACAO" type="hidden">
+        <input id="USUARIOATUAL" name="USUARIOATUAL" type="hidden">
+        <input id="DESCPROCESSOFLUIG" name="DESCPROCESSOFLUIG" type="hidden" value="Gestão Operacional - Field Service">
+        <input id="EXCLUSIVO1" name="EXCLUSIVO1" type="hidden">
+        <input id="AVISO_INTEGRACAO" name="AVISO_INTEGRACAO" type="hidden">
+        <input id="CHAVE" name="CHAVE" type="hidden">
+
+        <div class="fluig-style-guide">
+
+            <div id="main-app-container" class="container2">
+
+                <div class="header">
+                    <div class="header-container">
+                        <h1 class="header-title">Gestão Operacional - Field Service</h1>
+                    </div>
+                </div>
+
+                <div class="main-content">
+
+                    <div id="selection-menu" class="initial-setup compact">
+
+                        <div class="form-group">
+                            <label for="PROJETO" class="form-label">Selecione o Projeto:</label>
+                            <input type="zoom" class="form-control" id="PROJETO" name="PROJETO" data-zoom="{
+                                    'displayKey':'DESCRICAO_COMPLETA',
+
+                                    'datasetId':'dsgestaoOperacional',
+                                    'maximumSelectionLength':'1',
+                                    'placeholder':'',
+                                    'filterValues': 'OPERACAO,consultar,TIPO,Projetos',
+                                    'fields':[
+                                        {
+                                            'field':'DESCRICAO_COMPLETA',
+                                            'label':'Projeto',
+                                            'standard':'true',
+                                            'search':'true'
+                                        }   
+                                    ]
+                                }">
+                            <input type="hidden" id="CODCOLIGADA" name="CODCOLIGADA">
+                            <input type="hidden" id="CODFILIAL" name="CODFILIAL">
+                            <input type="hidden" id="CODPRJ" name="CODPRJ">
+                            <input type="hidden" id="IDPRJ" name="IDPRJ">
+                            <input type="hidden" id="DESCPROJETO" name="DESCPROJETO">
+                        </div>
+ 
+                  <button id="start-button" class="btn2 btn-add" onclick="iniciar()">Iniciar</button>
+                    </div>
+                    <div class="info-painel" style="display: none;">
+                        <button type="button" id="avancar" class="btn btn-danger" onclick="salvarDados()">
+                                <i class="fa-solid fa-check"></i> Validar & Salvar
+                            </button>
+
+
+        
+
+                        <div class="painel-wrapper">
+
+
+                                    <div class="excel-bar" id="statusCards" style="display: flex;">
+                                    <div class="excel-cell" id="atualizacaoField">
+                                        <span class="excel-label">Atualização:</span>
+                                        <span class="excel-value" id="atualizacaoValue"></span>
+                                    </div>
+
+                                    <div class="excel-cell" id="semanaField">
+                                        <span class="excel-label">Semana</span>
+                                        <span class="excel-value" id="semanaValue">47</span>
+                                    </div>
+
+                                    <div class="excel-cell excel-cell--wide" id="competenciaField">
+                                        <span class="excel-value" id="competenciaValue" style="display: none;"></span>
+                                        <input type="hidden" id="COMPETENCIAREFERENCIA" name="COMPETENCIAREFERENCIA">
+                                    </div>
+
+                                    <div class="excel-cell" id="projetoField">
+                                        <span class="excel-value" id="projetoValue" style="display: none;"></span>
+                                    </div>
+                                    </div>
+
+                            
+                            <input type="file" id="fileInput" name="fileInput" accept=".xlsx" style="display: none;">
+                            <br><br>
+                        </div>
+
+                        <div id="error-modal" class="modal" style="display: none;">
+                            <div class="modal-content">
+                                <h3 id="modal-title">Detalhes do Erro</h3>
+                                <p>As seguintes linhas contêm inconsistências:</p>
+                                <ul id="modal-error-list"></ul>
+                                <button type="button" class="btn btn-default" onclick="$('#error-modal').hide()">Fechar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="filter-feedback"></div>
+
+                    <div class="report-grid">
+
+                        <!-- COLUNA ESQUERDA -->
+                        <div class="left-col">
+
+                            
+                        <!-- SSMA -->
+                        <div class="block-ssma" id="ssmaContainer" style="display: none;">
+                        <table class="ssma-table" id="ssma-table">
+                            <thead>
+                            <tr>
+                                <th class="excel-title-big" colspan="3">SSMA</th>
+                            </tr>
+                            <tr>
+                                <th class="ssma-head-left"></th>
+                                <th class="ssma-head">Meta</th>
+                                <th class="ssma-head">Resultado</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="ssma-label">Zero Acidente</td>
+                                <td><input name="zeroAcidente" class="ssma-input" id="zeroAcidente" value="0"></td>
+                                <td><input name="zeroAcidenteResultado" class="ssma-input" id="zeroAcidenteResultado" value="#VALOR!"></td>
+                            </tr>
+                            <tr>
+                                <td class="ssma-label">Nº POC</td>
+                                <td><input name="nroPOC" class="ssma-input" id="nroPOC" value="398"></td>
+                                <td><input name="nroPOCResultado" class="ssma-input" id="nroPOCResultado" value="3471"></td>
+                            </tr>
+                            <tr>
+                                <td class="ssma-label">IFS</td>
+                                <td><input name="ifsMeta" class="ssma-input" id="ifsMeta" value="92,0%"></td>
+                                <td><input name="ifsResultado" class="ssma-input" id="ifsResultado" value="95,42%"></td>
+                            </tr>
+                            <tr>
+                                <td class="ssma-label">IPS</td>
+                                <td><input name="ipsMeta" class="ssma-input" id="ipsMeta" value="92,0%"></td>
+                                <td><input name="ipsResultado" class="ssma-input" id="ipsResultado" value="64,06%"></td>
+                            </tr>
+                            <tr>
+                                <td class="ssma-label">Nº Informes &quot;A&quot;</td>
+                                <td><input name="nInformes" class="ssma-input" id="nInformes" value="0"></td>
+                                <td><input name="nInformesResultado" class="ssma-input" id="nInformesResultado" value="#VALOR!"></td>
+                            </tr>
+                            <tr>
+                                <td class="ssma-label">Dias Se Acidentes</td>
+                                <td><input name="diasSemAcidentesMeta" class="ssma-input" id="diasSemAcidentesMeta" value="231"></td>
+                                <td><input name="diasSemAcidentesResultado" class="ssma-input" id="diasSemAcidentesResultado" value="231"></td>
+                            </tr>
+                            <tr>
+                                <td class="ssma-label">IPL</td>
+                                <td><input name="iplMeta" class="ssma-input" id="iplMeta" value="100%"></td>
+                                <td><input name="iplResultado" class="ssma-input" id="iplResultado" value="#VALOR!"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+
+                            <!-- ACOMPANHAMENTO FÍSICO (abaixo do SSMA) -->
+                            <div class="block-acompanhamento" id="block-acompanhamento" style="display: none;">
+                                <div class="excel-title-big">INFORMAÇÕES FÍSICAS E FINANCEIRAS</div>
+
+                                <table class="fisico-table" id="fisico-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="fisico-corner"></th>
+                                            <th class="fisico-head">Início</th>
+                                            <th class="fisico-head">Término</th>
+                                            <th class="fisico-head">% Av. Físico</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td class="fisico-rowhead">Previsto LB</td>
+                                            <td><input name="previstoLB" class="excel-input" id="previstoLB" value="12/05/2025"></td>
+                                            <td><input name="previstoLBTermino" class="excel-input" id="previstoLBTermino" value="23/11/2025"></td>
+                                            <td><input name="previstoLBPercentual" class="excel-input" id="previstoLBPercentual" value="99,74%"></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="fisico-rowhead">Tendência</td>
+                                            <td><input name="Tendencia" class="excel-input" id="Tendencia" value=""></td>
+                                            <td><input name="TendenciaTermino" class="excel-input" id="TendenciaTermino" value="23/11/2025"></td>
+                                            <td><input name="TendenciaPercentual" class="excel-input" id="TendenciaPercentual" value="100,00%"></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="fisico-rowhead">Realizado</td>
+                                            <td><input name="realizadoLB" class="excel-input" id="realizadoLB" value="12/05/2025"></td>
+                                            <td><input name="realizadoLBTermino" class="excel-input" id="realizadoLBTermino" value="19/11/2025"></td>
+                                            <td><input name="realizadoLBPercentual" class="excel-input" id="realizadoLBPercentual" value="100,00%"></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="fisico-rowhead row-blue">Desvio</td>
+                                            <td class="hist-blue"><input name="desvioLB" class="excel-input" id="desvioLB" value="0"></td>
+                                            <td class="hist-blue"><input name="desvioLBTermino" class="excel-input" id="desvioLBTermino" value="4"></td>
+                                            <td class="hist-blue"><input name="desvioLBPercentual" class="excel-input" id="desvioLBPercentual" value="0,26%"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
+                        <!-- COLUNA DIREITA -->
+                        <div class="right-col">
+
+                            <!-- HISTOGRAMA -->
+                            <div class="block-histograma" id="block-histograma" style="display: none;">
+                                <div class="excel-section-title">HISTOGRAMA</div>
+
+                                <table class="hist-table" id="hist-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="hist-corner"></th>
+                                            <th class="hist-head">Mão de Obra Indireta</th>
+                                            <th class="hist-head">Mão de Obra Direta</th>
+                                            <th class="hist-head">Equipamentos</th>
+                                            <th class="hist-head">Veículos</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td class="hist-rowhead">Previsto</td>
+                                            <td><input name="previstoLB" class="hist-input" id="previstoLB" value="11"></td>
+                                            <td><input name="previstoLBDireta" class="hist-input" id="previstoLBDireta" value="17"></td>
+                                            <td><input name="previstoLBEquipamentos" class="hist-input" id="previstoLBEquipamentos" value="2"></td>
+                                            <td><input name="previstoLBVeiculos" class="hist-input" id="previstoLBVeiculos" value="6"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="hist-rowhead">Real</td>
+                                            <td><input name="realLB" class="hist-input" id="realLB" value="11"></td>
+                                            <td><input name="realLBDireta" class="hist-input" id="realLBDireta" value="16"></td>
+                                            <td><input name="realLBEquipamentos" class="hist-input" id="realLBEquipamentos" value="2"></td>
+                                            <td><input name="realLBVeiculos" class="hist-input" id="realLBVeiculos" value="6"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="hist-rowhead hist-rowhead--blue">Desvio</td>
+                                            <td class="hist-blue"><input name="desvioLB" class="hist-input" id="desvioLB" value="0"></td>
+                                            <td class="hist-blue"><input name="desvioLBDireta" class="hist-input" id="desvioLBDireta" value="-1"></td>
+                                            <td class="hist-blue"><input name="desvioLBEquipamentos" class="hist-input" id="desvioLBEquipamentos" value="0"></td>
+                                            <td class="hist-blue"><input name="desvioLBVeiculos" class="hist-input" id="desvioLBVeiculos" value="0"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- HH (abaixo do Histograma) -->
+                            <div class="block-hh" id="block-hh" style="display: none;">
+                                <table class="hh-table" id="hh-table">
+                                    <tbody>
+                                        <tr>
+                                            <td class="hh-label">HH PREVISTO NA SEMANA:</td>
+                                            <td class="hh-value"><input name="hhPrevistoSemana" id="hhPrevistoSemana" class="excel-input" value="783,2"></td>
+
+                                            <td class="hh-label">HH TOTAL PREVISTO NO PROJETO</td>
+                                            <td class="hh-value"><input name="hhTotalPrevistoProjeto" id="hhTotalPrevistoProjeto" class="excel-input" value="99066"></td>
+
+                                            <td class="hh-label">Previsto - Acumulado</td>
+                                            <td class="hh-value"><input name="hhPrevistoAcumulado" id="hhPrevistoAcumulado" class="excel-input" value="15527,6"></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="hh-label">HH PREV. ACC</td>
+                                            <td class="hh-value"><input name="hhPrevistoAcumulado" id="hhPrevistoAcumulado" class="excel-input" value="92004"></td>
+
+                                            <td class="hh-label">HH REAL ACUMULADO</td>
+                                            <td class="hh-value"><input name="hhRealAcumulado" id="hhRealAcumulado" class="excel-input" value="83538,4"></td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Curva (depois de todas as outras, dentro do modal branco) -->
+                    <div class="curve-block" id="curve-block" style="display: none;">
+                        <div class="curve-title">Curva de Avanço Físico</div>
+
+                        <table class="curve-table" id="curve-table">
+                            <thead>
+                                <tr>
+                                    <th class="curve-head" rowspan="2">Período</th>
+                                    <th class="curve-group" colspan="3">Acumulado</th>
+                                    <th class="curve-group" colspan="3">Semanal</th>
+                                    <th class="curve-head" rowspan="2">Ano</th>
+                                    <th class="curve-head" rowspan="2">Semana</th>
+                                </tr>
+
+                                <tr>
+                                    <th class="curve-subhead">Prev Acc</th>
+                                    <th class="curve-subhead">Replan Acc</th>
+                                    <th class="curve-subhead">Real. Acc.</th>
+
+                                    <th class="curve-subhead">Prev. LB/Sem</th>
+                                    <th class="curve-subhead">Replan/Sem</th>
+                                    <th class="curve-subhead">Real Sem</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td class="curve-rowhead">Sem-20</td>
+
+                                    <td><input class="curve-input" name="curveprevacc" id="curve-prev-acc" value="0,0%"></td>
+                                    <td><input class="curve-input" name="curverepplanacc" id="curve-replan-acc" value="0,0%"></td>
+                                    <td><input class="curve-input" name="curverealacc" id="curve-real-acc" value="0,0%"></td>
+
+                                    <td><input class="curve-input" name="curveprevlbsem" id="curve-prev-lb-sem" value="0,0%"></td>
+                                    <td><input class="curve-input" name="curvereplansem" id="curve-replan-sem" value="0,0%"></td>
+                                    <td><input class="curve-input" name="curverealsem" id="curve-real-sem" value="0,0%"></td>
+
+                                  <td>
+                                        <input 
+                                            class="curve-input-ano" 
+                                            name="curveANO"
+                                            id="curveANO"
+                                            type="text"
+                                            list="years-list" 
+                                            value="2025"
+                                            maxlength="4"
+                                            placeholder="YYYY"
+                                        >
+                                    </td>
+                                    <td><input class="curve-input" name="curvesemana" id="curve-semana" value="Semana 01"></td>
+                                </tr>
+
+                                <tr>
+                                    <td class="curve-rowhead">Sem-21</td>
+
+                                    <td><input class="curve-input" name="curveprevblock" id="curve-block" value="0,1%"></td>
+                                    <td><input class="curve-input" name="curverepplanblock" id="curve-replan-block" value="0,1%"></td>
+                                    <td><input class="curve-input" name="curverealblock" id="curve-real-block" value="0,1%"></td>
+
+                                    <td><input class="curve-input" name="curveprevlbsem" id="curve-prev-lb-sem" value="0,1%"></td>
+                                    <td><input class="curve-input" name="curvereplansem" id="curve-replan-sem" value="0,1%"></td>
+                                    <td><input class="curve-input" name="curverealsem" id="curve-real-sem" value="0,1%"></td>
+
+                                    <td>
+                                        <input 
+                                            class="curve-input-ano"
+                                            name="curveANO2"
+                                            id="curveANO2" 
+                                            type="text"
+                                            list="years-list" 
+                                            value="2025"
+                                            maxlength="4"
+                                            placeholder="YYYY"
+                                        >
+                                    </td>
+                                    <td><input class="curve-input" name="curvesemana2" id="curve-semana2" value="Semana 02"></td>
+                                    <!-- ✅ DATALIST: Um único para TODOS os inputs de ano -->
+                                    <datalist id="years-list" class="curve-input">
+                                        <option value="2025"></option>
+                                        <option value="2026"></option>
+                                        <option value="2027"></option>''
+                                        <option value="2028"></option>
+                                        <option value="2029"></option>
+                                        <option value="2030"></option>
+                                        <option value="2031"></option>
+                                        <option value="2032"></option>
+                                        <option value="2033"></option>
+                                        <option value="2034"></option>
+                                        <option value="2035"></option>
+                                        <option value="2036"></option>
+                                        <option value="2037"></option>
+                                        <option value="2038"></option>
+                                        <option value="2039"></option>
+                                        <option value="2040"></option>
+                                        <option value="2041"></option>
+                                        <option value="2042"></option>
+                                        <option value="2043"></option>
+                                        <option value="2044"></option>
+                                        <option value="2045"></option>
+                                        <option value="2046"></option>
+                                        <option value="2047"></option>
+                                        <option value="2048"></option>
+                                        <option value="2049"></option>
+                                        <option value="2050"></option>
+                                        <option value="2051"></option>
+                                        <option value="2052"></option>
+                                    </datalist>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </tbody>
+                    </table>
+                    
+                    <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-info" onclick="adicionarLinhaCurva()">
+                                <i class="flaticon flaticon-add-plus icon-sm"></i> Adicionar Linha
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="removerLinhaCurva()">
+                                <i class="flaticon flaticon-trash icon-sm"></i> Remover Linha
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+                <div id="view-contract-info-footer" style="display: block !important; visibility: visible !important;">
+                <button type="button" id="voltarInicio-button" class="btn btn-danger" onclick="voltarInicio()">Voltar</button>
+                </div>
+
+                <div id="error-modal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <h3 id="modal-title"></h3>
+                        <p>As seguintes linhas (identificadas pelo ID) contêm um erro nesta coluna:</p>
+                        <ul id="modal-error-list"></ul>
+                    </div>
+                </div>
+
+            </div>
+         </div> 
+        
+       
+        <script type="text/javascript" src="js/control/documentReady.js"></script>
+        <script type="text/javascript" src="js/validacao_dados_excel.js"></script>
+        <script type="text/javascript" src="js/control/selectZoom.js"></script>
+
+        <script type="text/javascript" src="js/integracaoDados.js"></script>
+        <script type="text/javascript" src="js/consultarDados.js"></script>
+        <script type="text/javascript" src="js/control/Sessions.js"></script>
+        <script type="text/javascript" src="js/control/worker.js"></script>
+        <script type="text/javascript" src="js/control/util.js"></script>
+        <script type="text/javascript" src="js/operacoes_em_tela.js"></script>
+        <script type="text/javascript" src="js/control/beforeSendValidate.js"></script>
+
+    </form>
+</body>
+</html>
+

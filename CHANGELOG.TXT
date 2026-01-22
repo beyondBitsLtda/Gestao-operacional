@@ -1,0 +1,54 @@
+Procedures
+
+Preparação:
+
+	- Refatorar procedure (refinar parametros) -- OK
+	- testar e validar -- OK 
+
+	INTEGRAÇÃO:
+
+	 1 - Fazer ALTER TABLE para incluir campo "CHAVE" e campo "PROCESSO". -- OK
+		- CHAVE VARCHAR(100)
+		- PROCESSO INT
+	 2 - Criar campo HIDEN no formulário para campo "CHAVE". -- OK
+	 3 - Criar função de gerarChave - Util.js -- ok
+	 4 - Salvar a chave no documentReady.js -- ok
+	 5 - Revisar operações de INCLUSAO/ UPDATE para salvar a informação "CHAVE"  -- OK
+	 6 - Criar scrippt de workflow affterProcessCreate -- ok
+	 7 - Criar atividade serviço -- ok
+		 Fazer na segunda feira -- 
+		 8 - Adptar paarmetros da procedure (para prcesso e idprj)
+		 9 - Criar script para pegar numero do processo e passar no dataset
+		 10 - Criar script com constraits da procedure
+		 11 - fazer integração da procedure.
+	 
+	AJUSTES:
+			Fazer na terça --
+		1 - Ajustar  tabela de curva de avanço  paar dicionar ano curva (fluig e rm)
+		2 - ajustar html da curva de avanço para te rapenas uma tabela (varrer código e ver impactos disso)
+		3 - Crir sinalização de erros na tela
+		4 - Deixar destacado campos de preenchimento automático
+		
+	ESTETICA:
+			Fazer na segunda
+		1 - reformular visual das tabelas
+		2 - reposicionar tebelas de forma mais estetica
+	 
+	 obs: Formulário de ref importarProduto
+	 
+	 
+	 (SELECT ISNULL(MAX(ID),0)+1 FROM ZMDSSMA)
+	 (SELECT ISNULL(MAX(ID),0)+1 FROM ZMDINFOFISICASFINANCEIRAS)
+	 (SELECT ISNULL(MAX(ID),0)+1 FROM ZMDHISTOGRAMA)
+	 (SELECT ISNULL(MAX(ID),0)+1 FROM ZMDHISTOGRAMA_AUXILIAR)
+	 (SELECT ISNULL(MAX(ID),0)+1 FROM ZMDCURVADEAVANCO)
+	 
+	    Z_DELP_SSMA
+		Z_DELP_INFORMACOES_FISICAS_FINANCEIRAS
+		Z_DELP_HISTOGRAMA_AUXILIAR
+		Z_DELP_HISTOGRAMA
+		DELP_Z_CURVA_DE_AVANCO
+		
+		
+		RHINO -> transcrever o codigo usnaod o RHINO
+		HAPI -> converte usando 
