@@ -86,6 +86,21 @@ function createDataset(fields, constraints, sortFields) {
 	var replanSem = "";
 	var realSem = "";
 	var semana = "";
+	// =====================================================================
+	// [AJUSTE CORRETIVO] Novas colunas de integração (DESVIO_*)
+	// - O front agora envia DESVIO_INICIO e DESVIO_TERMINO em todas as operações.
+	// - Mantemos a estrutura original e apenas adicionamos variáveis auxiliares.
+	// =====================================================================
+	var desvioInicio = "";
+	var desvioTermino = "";
+
+	// =====================================================================
+	// [AJUSTE CORRETIVO] Filtro opcional por categoria
+	// - Alguns SELECTs já usam "filtroCategoria", mas a variável não existia.
+	// - Inicializamos com string vazia e montamos de forma segura.
+	// - NÃO alteramos a estrutura do SELECT: apenas preparamos o fragmento.
+	// =====================================================================
+	var filtroCategoria = "";
     
     if (constraints != null) {
 
@@ -423,8 +438,31 @@ function createDataset(fields, constraints, sortFields) {
 			else if(constraints[i].fieldName == "SEMANA"){
 				semana = constraints[i].initialValue;
 			}
+			// =================================================================
+			// [AJUSTE CORRETIVO] Leitura das novas constraints DESVIO_*
+			// - Necessário para suportar o salvamento feito no front-end.
+			// - Mantém padrão de leitura de constraints já consolidado.
+			// =================================================================
+			else if(constraints[i].fieldName == "DESVIO_INICIO"){
+				desvioInicio = constraints[i].initialValue;
+			}
+			else if(constraints[i].fieldName == "DESVIO_TERMINO"){
+				desvioTermino = constraints[i].initialValue;
+			}
         }        
     }  
+
+	// =====================================================================
+	// [AJUSTE CORRETIVO] Montagem segura do filtro opcional de categoria
+	// - Se NOME_CATEGORIA NÃO vier, o filtro deve ser vazio (sem restrição).
+	// - Se vier, adiciona o AND correspondente.
+	// - NÃO altera o SQL base, apenas fornece o fragmento esperado.
+	// =====================================================================
+	if (!isNulo(nomeCategoria)) {
+		filtroCategoria = " AND NOME_CATEGORIA = '" + nomeCategoria + "' ";
+	} else {
+		filtroCategoria = "";
+	}
       
     log.info("operacao: "+operacao+", tipo: "+tipo);
     
@@ -501,6 +539,9 @@ function createDataset(fields, constraints, sortFields) {
 						"SELECT " +
 						"META = " + meta + ", " +
 						"RESULTADO = " + resultado + ", " +
+						"CHAVE, " +
+						"DESVIO_INICIO, " +
+						"DESVIO_TERMINO, " +
 						"RECMODIFIEDBY, " +
 						"RECMODIFIEDON, " +
 						"EFETIVADO, " +
@@ -519,10 +560,11 @@ function createDataset(fields, constraints, sortFields) {
 						"AND MES = " + mes + " " +
 						"AND ANO = " + ano + " " +
 						"AND COMPETENCIA = '" + competencia + "' " +  // mantém o filtro de competência
-						filtroCategoria + " " +                         // adiciona o filtro dinâmico
-						"AND NOME_CATEGORIA = '" + nomeCategoria + "'";
+						filtroCategoria + " ";                         // adiciona o filtro dinâmico
 
 					log.info("SQL SELECT SSMA => " + myQuerySelect);
+					// [AJUSTE CORRETIVO] garante que o SELECT montado seja executado
+					myQuery = myQuerySelect;
 					}
 
 
@@ -538,6 +580,9 @@ function createDataset(fields, constraints, sortFields) {
 						"INICIO, " +
 						"TERMINO, " + 
 						"AV_FISICO, " +
+						"DESVIO_INICIO, " +
+						"DESVIO_TERMINO, " +
+						"CHAVE, " +
 						"RECMODIFIEDBY, " +
 						"RECMODIFIEDON, " +
 						"EFETIVADO, " +
@@ -550,10 +595,11 @@ function createDataset(fields, constraints, sortFields) {
 						"AND MES = " + mes + " " +
 						"AND ANO = " + ano + " " +
 						"AND COMPETENCIA = '" + competencia + "' " +  // mantém filtro de competência
-						filtroCategoria + " " +                         // adiciona filtro dinâmico
-						"AND NOME_CATEGORIA = '" + nomeCategoria + "'";
+						filtroCategoria + " ";                         // adiciona filtro dinâmico
 
 					log.info("SQL SELECT INFORMACOES_FISICAS => " + myQuerySelect);
+					// [AJUSTE CORRETIVO] garante que o SELECT montado seja executado
+					myQuery = myQuerySelect;
 					}
 
 
@@ -566,6 +612,9 @@ function createDataset(fields, constraints, sortFields) {
 					"MAO_DE_OBRA_DIRETA, " +
 					"EQUIPAMENTOS, " +
 					"VEICULOS, " +
+					"DESVIO_INICIO, " +
+					"DESVIO_TERMINO, " +
+					"CHAVE, " +
 					"RECMODIFIEDBY, " +
 					"RECMODIFIEDON, " +
 					"EFETIVADO, " +
@@ -578,10 +627,11 @@ function createDataset(fields, constraints, sortFields) {
 					"AND MES = " + mes + " " +
 					"AND ANO = " + ano + " " +
 					"AND COMPETENCIA = '" + competencia + "' " +  // mantém filtro de competência
-					filtroCategoria + " " +                         // adiciona filtro dinâmico
-					"AND NOME_CATEGORIA = '" + nomeCategoria + "'";
+					filtroCategoria + " ";                         // adiciona filtro dinâmico
 
 				log.info("SQL SELECT HISTOGRAMA => " + myQuerySelect);
+				// [AJUSTE CORRETIVO] garante que o SELECT montado seja executado
+				myQuery = myQuerySelect;
 				}
 
 
@@ -592,6 +642,9 @@ function createDataset(fields, constraints, sortFields) {
 				var myQuerySelect =
 					"SELECT " +
 					"VALOR_CATEGORIA, " +
+					"DESVIO_INICIO, " +
+					"DESVIO_TERMINO, " +
+					"CHAVE, " +
 					"RECMODIFIEDBY, " +
 					"RECMODIFIEDON, " +
 					"EFETIVADO, " +
@@ -604,10 +657,11 @@ function createDataset(fields, constraints, sortFields) {
 					"AND MES = " + mes + " " +
 					"AND ANO = " + ano + " " +
 					"AND COMPETENCIA = '" + competencia + "' " +  // mantém filtro de competência
-					filtroCategoria + " " +                         // adiciona filtro dinâmico
-					"AND NOME_CATEGORIA = '" + nomeCategoria + "'";
+					filtroCategoria + " ";                         // adiciona filtro dinâmico
 
 				log.info("SQL SELECT HISTOGRAMA_AUXILIAR => " + myQuerySelect);
+				// [AJUSTE CORRETIVO] garante que o SELECT montado seja executado
+				myQuery = myQuerySelect;
 				}
 
 
@@ -623,6 +677,9 @@ function createDataset(fields, constraints, sortFields) {
 						"PREV_LB_SEM, " +
 						"REPLAN_SEM, " +
 						"REAL_SEM, " +
+						"DESVIO_INICIO, " +
+						"DESVIO_TERMINO, " +
+						"CHAVE, " +
 						"RECMODIFIEDBY, " +
 						"RECMODIFIEDON, " +
 						"EFETIVADO, " +
@@ -640,7 +697,76 @@ function createDataset(fields, constraints, sortFields) {
 						"AND SEMANA = '" + semana + "'";
 
 					log.info("SQL SELECT CURVA_AVANCO => " + myQuerySelect);
+					// [AJUSTE CORRETIVO] garante que o SELECT montado seja executado
+					myQuery = myQuerySelect;
 					}
+
+				// =================================================================
+				// [AJUSTE CORRETIVO] Suporte à consulta de ÚLTIMA INTEGRAÇÃO
+				// - Mantém o padrão OPERACAO=consultar / TIPO=ULTIMA_INTEGRACAO.
+				// - Não altera o fluxo do dataset, apenas adiciona um bloco.
+				// - Retorna a integração mais recente (EFETIVADO=0) por projeto.
+				// =================================================================
+				if (tipo === "ULTIMA_INTEGRACAO") {
+					var myQuerySelect =
+						"SELECT TOP 1 " +
+						"TIPO, " +
+						"CHAVE, " +
+						"COMPETENCIA, " +
+						"MES, " +
+						"ANO, " +
+						"RECMODIFIEDON, " +
+						"EFETIVADO, " +
+						"COLIGADA, " +
+						"CODPRJ, " +
+						"IDPRJ " +
+						"FROM ( " +
+						"SELECT " +
+						"'SSMA' AS TIPO, CHAVE, COMPETENCIA, MES, ANO, RECMODIFIEDON, EFETIVADO, COLIGADA, CODPRJ, IDPRJ " +
+						"FROM FLUIG.DBO.Z_DELP_SSMA " +
+						"WHERE EFETIVADO = 0 " +
+						"AND COLIGADA = " + codColigada + " " +
+						"AND CODPRJ = '" + codPrj + "' " +
+						"AND IDPRJ = " + idprj + " " +
+						"UNION ALL " +
+						"SELECT " +
+						"'INFORMACOES_FISICAS' AS TIPO, CHAVE, COMPETENCIA, MES, ANO, RECMODIFIEDON, EFETIVADO, COLIGADA, CODPRJ, IDPRJ " +
+						"FROM FLUIG.DBO.Z_DELP_INFORMACOES_FISICAS_FINANCEIRAS " +
+						"WHERE EFETIVADO = 0 " +
+						"AND COLIGADA = " + codColigada + " " +
+						"AND CODPRJ = '" + codPrj + "' " +
+						"AND IDPRJ = " + idprj + " " +
+						"UNION ALL " +
+						"SELECT " +
+						"'HISTOGRAMA' AS TIPO, CHAVE, COMPETENCIA, MES, ANO, RECMODIFIEDON, EFETIVADO, COLIGADA, CODPRJ, IDPRJ " +
+						"FROM FLUIG.DBO.Z_DELP_HISTOGRAMA " +
+						"WHERE EFETIVADO = 0 " +
+						"AND COLIGADA = " + codColigada + " " +
+						"AND CODPRJ = '" + codPrj + "' " +
+						"AND IDPRJ = " + idprj + " " +
+						"UNION ALL " +
+						"SELECT " +
+						"'HISTOGRAMA_AUXILIAR' AS TIPO, CHAVE, COMPETENCIA, MES, ANO, RECMODIFIEDON, EFETIVADO, COLIGADA, CODPRJ, IDPRJ " +
+						"FROM FLUIG.DBO.Z_DELP_HISTOGRAMA_AUXILIAR " +
+						"WHERE EFETIVADO = 0 " +
+						"AND COLIGADA = " + codColigada + " " +
+						"AND CODPRJ = '" + codPrj + "' " +
+						"AND IDPRJ = " + idprj + " " +
+						"UNION ALL " +
+						"SELECT " +
+						"'CURVA_AVANCO' AS TIPO, CHAVE, COMPETENCIA, MES, ANO, RECMODIFIEDON, EFETIVADO, COLIGADA, CODPRJ, IDPRJ " +
+						"FROM FLUIG.DBO.DELP_Z_CURVA_DE_AVANCO " +
+						"WHERE EFETIVADO = 0 " +
+						"AND COLIGADA = " + codColigada + " " +
+						"AND CODPRJ = '" + codPrj + "' " +
+						"AND IDPRJ = " + idprj + " " +
+						") AS ULTIMA " +
+						"ORDER BY RECMODIFIEDON DESC";
+
+					log.info("SQL SELECT ULTIMA_INTEGRACAO => " + myQuerySelect);
+					// [AJUSTE CORRETIVO] garante que o SELECT montado seja executado
+					myQuery = myQuerySelect;
+				}
 
     	
     }
@@ -655,6 +781,8 @@ function createDataset(fields, constraints, sortFields) {
 						"UPDATE FLUIG.DBO.Z_DELP_SSMA SET " +
 						"META = " + meta + ", " +
 						"RESULTADO = " + resultado + ", " +
+						"DESVIO_INICIO = " + desvioInicio + ", " +
+						"DESVIO_TERMINO = " + desvioTermino + ", " +
 						"RECMODIFIEDBY = '" + usuario + "', " +
 						"RECMODIFIEDON = GETDATE() " +
 						"WHERE EFETIVADO = 0 " +
@@ -679,6 +807,8 @@ function createDataset(fields, constraints, sortFields) {
 							"MAO_DE_OBRA_DIRETA = " + maoObraDireta + ", " +
 							"EQUIPAMENTOS = " + equipamentos + ", " +
 							"VEICULOS = " + veiculos + ", " +
+							"DESVIO_INICIO = " + desvioInicio + ", " +
+							"DESVIO_TERMINO = " + desvioTermino + ", " +
 							"RECMODIFIEDBY = '" + usuario + "', " +
 							"RECMODIFIEDON = GETDATE() " +
 							"WHERE EFETIVADO = 0 " +
@@ -701,6 +831,8 @@ function createDataset(fields, constraints, sortFields) {
 						var myQuery =
 							"UPDATE FLUIG.DBO.Z_DELP_HISTOGRAMA_AUXILIAR SET " +
 							"VALOR_CATEGORIA = " + valorCategoria + ", " +
+							"DESVIO_INICIO = " + desvioInicio + ", " +
+							"DESVIO_TERMINO = " + desvioTermino + ", " +
 							"RECMODIFIEDBY = '" + usuario + "', " +
 							"RECMODIFIEDON = GETDATE() " +
 							"WHERE EFETIVADO = 0 " +
@@ -727,6 +859,8 @@ function createDataset(fields, constraints, sortFields) {
 							"INICIO = " + inicioSQL + ", " +
 							"TERMINO = " + terminoSQL + ", " +
 							"AV_FISICO = " + avFisico + ", " +
+							"DESVIO_INICIO = " + desvioInicio + ", " +
+							"DESVIO_TERMINO = " + desvioTermino + ", " +
 							"RECMODIFIEDBY = '" + usuario + "', " +
 							"RECMODIFIEDON = GETDATE() " +
 							"WHERE EFETIVADO = 0 " +
@@ -753,6 +887,8 @@ function createDataset(fields, constraints, sortFields) {
 							"PREV_LB_SEM = " + prevLbSem + ", " +
 							"REPLAN_SEM = " + replanSem + ", " +
 							"REAL_SEM = " + realSem + ", " +
+							"DESVIO_INICIO = " + desvioInicio + ", " +
+							"DESVIO_TERMINO = " + desvioTermino + ", " +
 							"RECMODIFIEDBY = '" + usuario + "', " +
 							"RECMODIFIEDON = GETDATE() " +
 							"WHERE EFETIVADO = 0 " +
@@ -778,7 +914,7 @@ function createDataset(fields, constraints, sortFields) {
             myQuery = "INSERT INTO FLUIG.DBO.Z_DELP_SSMA (" +
                     "COLIGADA, CODPRJ, IDPRJ, MES, ANO, EFETIVADO, " +
                     "RECCREATEDBY, RECCREATEDON, RECMODIFIEDBY, RECMODIFIEDON, " +
-                    "COMPETENCIA, CHAVE, NOME_CATEGORIA, META, RESULTADO" +
+                    "COMPETENCIA, CHAVE, NOME_CATEGORIA, META, RESULTADO, DESVIO_INICIO, DESVIO_TERMINO" +
                     ") VALUES(" +
                     codColigada + "," +
                     "'" + codPrj + "'," +
@@ -791,10 +927,12 @@ function createDataset(fields, constraints, sortFields) {
                     "'" + usuario + "'," +
                     "GETDATE()," +
                     "'" + competencia + "'," +
-					"'" + chave + "'," +
+                    "'" + chave + "'," +
                     "'" + nomeCategoria + "'," +
                     meta + "," +
-                    resultado +
+                    resultado + "," +
+                    desvioInicio + "," +
+                    desvioTermino +
                     ")";
             
             log.info("SQL SSMA => " + myQuery);     
@@ -808,7 +946,7 @@ function createDataset(fields, constraints, sortFields) {
                       "COLIGADA, CODPRJ, IDPRJ, MES, ANO, EFETIVADO, " +
                       "RECCREATEDBY, RECCREATEDON, RECMODIFIEDBY, RECMODIFIEDON, " +
                       "COMPETENCIA, CHAVE, NOME_CATEGORIA, " +
-                      "MAO_DE_OBRA_INDIRETA, MAO_DE_OBRA_DIRETA, EQUIPAMENTOS, VEICULOS" +
+                      "MAO_DE_OBRA_INDIRETA, MAO_DE_OBRA_DIRETA, EQUIPAMENTOS, VEICULOS, DESVIO_INICIO, DESVIO_TERMINO" +
                       ") VALUES(" +
                       codColigada + "," +
                       "'" + codPrj + "'," +
@@ -826,7 +964,9 @@ function createDataset(fields, constraints, sortFields) {
                       maoObraIndireta + "," +
                       maoObraDireta + "," +
                       equipamentos + "," +
-                      veiculos +
+                      veiculos + "," +
+                      desvioInicio + "," +
+                      desvioTermino +
                       ")";
     
             log.info("SQL HISTOGRAMA => " + myQuery);
@@ -838,7 +978,7 @@ function createDataset(fields, constraints, sortFields) {
             myQuery = "INSERT INTO FLUIG.DBO.Z_DELP_HISTOGRAMA_AUXILIAR (" +
                       "COLIGADA, CODPRJ, IDPRJ, MES, ANO, EFETIVADO, " +
                       "RECCREATEDBY, RECCREATEDON, RECMODIFIEDBY, RECMODIFIEDON, " +
-                      "COMPETENCIA, CHAVE, NOME_CATEGORIA, VALOR_CATEGORIA" +
+                      "COMPETENCIA, CHAVE, NOME_CATEGORIA, VALOR_CATEGORIA, DESVIO_INICIO, DESVIO_TERMINO" +
                       ") VALUES(" +
                       codColigada + "," +
                       "'" + codPrj + "'," +
@@ -851,9 +991,11 @@ function createDataset(fields, constraints, sortFields) {
                       "'" + usuario + "'," +
                       "GETDATE()," +
                       "'" + competencia + "'," +
-					  "'" + chave + "'," +
+                      "'" + chave + "'," +
                       "'" + nomeCategoria + "'," +
-                      valorCategoria +
+                      valorCategoria + "," +
+                      desvioInicio + "," +
+                      desvioTermino +
                       ")";
             
             log.info("SQL HISTOGRAMA_AUXILIAR => " + myQuery);
@@ -869,7 +1011,7 @@ function createDataset(fields, constraints, sortFields) {
             myQuery = "INSERT INTO FLUIG.DBO.Z_DELP_INFORMACOES_FISICAS_FINANCEIRAS (" +
                       "COLIGADA, CODPRJ, IDPRJ, MES, ANO, EFETIVADO, " +
                       "RECCREATEDBY, RECCREATEDON, RECMODIFIEDBY, RECMODIFIEDON, " +
-                      "COMPETENCIA, CHAVE, NOME_CATEGORIA, INICIO, TERMINO, AV_FISICO" +
+                      "COMPETENCIA, CHAVE, NOME_CATEGORIA, INICIO, TERMINO, AV_FISICO, DESVIO_INICIO, DESVIO_TERMINO" +
                       ") VALUES(" +
                       codColigada + "," +
                       "'" + codPrj + "'," +
@@ -886,7 +1028,9 @@ function createDataset(fields, constraints, sortFields) {
                       "'" + nomeCategoria + "'," +
                       inicioSQL + "," +
                       terminoSQL + "," +
-                      avFisico +
+                      avFisico + "," +
+                      desvioInicio + "," +
+                      desvioTermino +
                       ")";
             
             log.info("SQL INFORMACOES_FISICAS => " + myQuery);
@@ -900,7 +1044,7 @@ function createDataset(fields, constraints, sortFields) {
                       "COLIGADA, CODPRJ, IDPRJ, MES, ANO, EFETIVADO, " +
                       "RECCREATEDBY, RECCREATEDON, RECMODIFIEDBY, RECMODIFIEDON, " +
                       "COMPETENCIA, CHAVE, PERIODO, PREV_ACC, REPLAN_ACC, REAL_ACC, " +
-                      "PREV_LB_SEM, REPLAN_SEM, REAL_SEM, SEMANA" +
+                      "PREV_LB_SEM, REPLAN_SEM, REAL_SEM, SEMANA, DESVIO_INICIO, DESVIO_TERMINO" +
                       ") VALUES(" +
                       codColigada + "," +
                       "'" + codPrj + "'," +
@@ -921,7 +1065,9 @@ function createDataset(fields, constraints, sortFields) {
                       prevLbSem + "," +
                       replanSem + "," +
                       realSem + "," +
-                      "'" + semana + "'" +
+                      "'" + semana + "'," +
+                      desvioInicio + "," +
+                      desvioTermino +
                       ")";
     }
 
